@@ -2,3 +2,4 @@
 # Flask/Python
 venv
 __pycache__
+.env*
