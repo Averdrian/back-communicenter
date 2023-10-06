@@ -16,9 +16,13 @@ app.config.from_object(Config)
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 db = SQLAlchemy(app)
-from models.user import User #Import models to migrate them
+from src.models.user import User #Import models to migrate them
 migrate = Migrate(app, db, directory='src/migrations')
 
+
+#Add routes from blueprints to app
+from src.routes.user_routes import user_routes
+app.register_blueprint(user_routes)
 
 #Temporary routes, deleting soon
 @app.route('/')
