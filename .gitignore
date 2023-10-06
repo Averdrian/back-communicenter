@@ -1,5 +1,11 @@
-
-# Flask/Python
+#The virtual enviroment
 venv
+
+#All the pycache folders
 __pycache__
+
+#Enviroment variables
 .env*
+
+#The migrations folder
+src/migrations
