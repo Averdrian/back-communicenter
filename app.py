@@ -24,18 +24,6 @@ migrate = Migrate(app, db, directory='src/migrations')
 from src.routes.user_routes import user_routes
 app.register_blueprint(user_routes)
 
-#Temporary routes, deleting soon
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
-
-@app.route('/api/data', methods=['GET'])
-def get_data():
-    data = jsonify({'nombre': 'John', 'edad': 30, 'ciudad': 'Nueva York'})
-    response = make_response(data, 202)
-    return response
-
-
 #Run the application
 if __name__ == '__main__':
     app.run()

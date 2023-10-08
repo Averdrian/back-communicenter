@@ -1,5 +1,4 @@
-from app import app, db
-from flask import Blueprint
+from app import db
 from src.models.user import User
 from src.utils.hash_password import hash_password, check_password
 
