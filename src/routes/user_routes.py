@@ -1,8 +1,7 @@
 from marshmallow import Schema, fields, ValidationError
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, make_response
 
 from src.controllers.user_controller import UserController
-from src.controllers.auth_controller import AuthController
 
 user_routes = Blueprint('user_routes', __name__)
 
@@ -20,8 +19,8 @@ def sign_up():
         user_data = create_user_schema.load(request.json)
         
     except ValidationError as error:
-        return jsonify({'error': error.messages}), 400
+        return make_response(jsonify({'error': error.messages}), 400)
         
     result = UserController.create(user_data)
 
-    return jsonify(result)
+    return make_response(result)

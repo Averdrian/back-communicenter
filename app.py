@@ -1,8 +1,9 @@
-from flask import Flask, jsonify, make_response
+from flask import Flask
 import os
 
 #Create the flask instance
 app = Flask(__name__)
+
 
 #Add the URL from the frontend to the cors policy
 from flask_cors import CORS
@@ -12,12 +13,22 @@ CORS(app, origins=os.getenv("FRONT_URL"))
 from config import Config
 app.config.from_object(Config)
 
+
 #Integrate SQLAlchemy to database and FlaskMigrate to migrations
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 db = SQLAlchemy(app)
 from src.models.user import User #Import models to migrate them
 migrate = Migrate(app, db, directory='src/migrations')
+
+
+#Authentication, login manager
+from flask_login import LoginManager
+login_manager = LoginManager()
+login_manager.init_app(app)
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.filter_by(id=user_id).first()
 
 
 #Add routes from blueprints to app

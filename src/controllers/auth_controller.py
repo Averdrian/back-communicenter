@@ -1,5 +1,6 @@
 from src.models.user import User
 from src.utils.hash_password import check_password
+from flask_login import login_user, logout_user
 
 class AuthController:
 
@@ -12,10 +13,9 @@ class AuthController:
             user = User.query.filter_by(email=email).first()
 
             if user and check_password(password, user.password):
-                #TODO: SESION AL HACER LOGIN
+                login_user(user)
                 return 'success', 200
             
-
             else: return 'Authentication error', 401
 
         except Exception as e:
@@ -23,5 +23,5 @@ class AuthController:
         
 
     def logout():
-        #TODO: Deshacer la sesion, hacer logout
-        return '', 200
+        logout_user()
+        return 'success', 200

@@ -26,8 +26,3 @@ class UserController:
             # Error inserting into database
             db.session.rollback()
             return {'error': 'Failed to create user: ' + str(e)}, 500
-        
-
-
-
-    

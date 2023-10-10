@@ -1,8 +1,8 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, make_response
 from marshmallow import Schema, fields, ValidationError
 from src.controllers.auth_controller import AuthController
 
-auth_routes = Blueprint('user_routes', __name__)
+auth_routes = Blueprint('auth_routes', __name__)
 
 
 class LogInSchema(Schema):
@@ -20,11 +20,10 @@ def login():
     
     result = AuthController.login(login_data)
 
-    return jsonify(result)
-
+    return make_response(result)
 
 
 @auth_routes.route('/logout', methods=['POST'])
 def logout():
     result = AuthController.logout()
-    return jsonify(result)
+    return make_response(result)
