@@ -1,4 +1,4 @@
-from app import db
+from app import db, login_manager
 from flask_login import UserMixin
 
 
@@ -16,3 +16,6 @@ class User(UserMixin, db.Model):
     def get_id(self):
         return str(self.id)
 
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.filter_by(id=user_id).first()

@@ -18,7 +18,6 @@ app.config.from_object(Config)
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 db = SQLAlchemy(app)
-from src.models.user import User #Import models to migrate them
 migrate = Migrate(app, db, directory='src/migrations')
 
 
@@ -26,10 +25,7 @@ migrate = Migrate(app, db, directory='src/migrations')
 from flask_login import LoginManager
 login_manager = LoginManager()
 login_manager.init_app(app)
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.filter_by(id=user_id).first()
-
+# from src.models.user import User #Import models to migrate them
 
 #Add routes from blueprints to app
 from src.routes.user_routes import user_routes

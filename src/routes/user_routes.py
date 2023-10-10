@@ -24,3 +24,4 @@ def sign_up():
     result = UserController.create(user_data)
 
     return make_response(result)
+

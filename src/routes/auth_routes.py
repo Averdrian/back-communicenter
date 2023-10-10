@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify, make_response
+from flask_login import login_required
 from marshmallow import Schema, fields, ValidationError
 from src.controllers.auth_controller import AuthController
 
@@ -24,6 +25,7 @@ def login():
 
 
 @auth_routes.route('/logout', methods=['POST'])
+@login_required
 def logout():
     result = AuthController.logout()
     return make_response(result)
