@@ -9,10 +9,25 @@ app = Flask(__name__)
 from flask_cors import CORS
 CORS(app, origins=os.getenv("FRONT_URL"))
 
+# #Configuration for logg
+import logging
+# Configurate logger level
+logging.basicConfig(level=logging.DEBUG)
+
+# Create logger object
+logger = logging.getLogger('myapp')
+
+# Agrega un manejador de archivos para el registro
+file_handler = logging.FileHandler('app.log')
+log_level = os.getenv('LOG_LEVEL', 'INFO')
+file_handler.setLevel(logging.getLevelName(log_level))
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
 #Gets our Config object into the instance configuration
 from config import Config
 app.config.from_object(Config)
-
 
 #Integrate SQLAlchemy to database and FlaskMigrate to migrations
 from flask_sqlalchemy import SQLAlchemy

@@ -9,3 +9,6 @@ __pycache__
 
 #The migrations folder
 src/migrations
+
+#Logs
+*.log
