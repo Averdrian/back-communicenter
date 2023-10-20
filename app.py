@@ -45,8 +45,10 @@ login_manager.init_app(app)
 #Add routes from blueprints to app
 from src.routes.user_routes import user_routes
 from src.routes.auth_routes import auth_routes
+from src.routes.webhook_routes import webhook_routes
 app.register_blueprint(user_routes)
 app.register_blueprint(auth_routes)
+app.register_blueprint(webhook_routes)
 
 #Run the application
 if __name__ == '__main__':
