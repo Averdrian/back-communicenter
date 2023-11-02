@@ -4,6 +4,7 @@ from marshmallow import Schema, fields, ValidationError
 from app import logger
 from src.controllers.webhook_controller import WebhookController
 from src.services.message_service import MessageService
+import json
 
 webhook_routes = Blueprint('webhook_routes', __name__)
 
@@ -28,11 +29,31 @@ def verify_token():
 
 @webhook_routes.route('/webhook', methods=['POST'])
 def recieve_message():
-    # logger.debug('Full: ' + str(request.json))
-    logger.debug('Phone Number: ' + MessageService.getPhoneNumber(request.json))
-    logger.debug('Whatsapp Name: ' + MessageService.getWhatsAppName(request.json))
-    message_object = MessageService.getMessageObject(request.json)
-    logger.debug('Message object: ' + str(message_object))
-    # logger.debug('Message object: ' + str(MessageService.getMessageObject(request.json)))
-    logger.debug('Mime_type: ' + MessageService.getFileMimeType(message_object))
-    return jsonify({'message': 'debug'}), 418
+    logger.debug('Full: ' + str(request.json))
+
+    message_data = MessageService.getMessageData(request.json)
+
+    logger.debug(message_data)
+
+    # logger.debug('Phone Number: ' + MessageService.getPhoneNumber(request.json))
+    # logger.debug('Whatsapp Name: ' + MessageService.getWhatsAppName(request.json))
+    # message_object = MessageService.getMessageObject(request.json)
+    # # logger.debug('Message object: ' + str(message_object))
+    # # logger.debug('Media URL: ' + str(MessageService.getMediaUrl(MessageService.getMediaId(message_object))))
+
+    # logger.debug('Message_type: ' + MessageService.getMessageType(request.json))
+
+    # media_url_object = MessageService.getMediaUrl(MessageService.getMediaId(message_object))
+    # media_url_object = json.loads(media_url_object)
+
+    # logger.debug(str(MessageService.getMediaImage(media_url_object['url'])))
+
+    # return MessageService.getMediaImage(media_url_object['url'])
+
+    # logger.info('URL: ' + media_url_object['url'])
+    
+    # # logger.debug('Message object: ' + str(MessageService.getMessageObject(request.json)))
+    # # logger.debug('Mime_type: ' + MessageService.getFileMimeType(message_object))
+    # return jsonify({'message': 'debug'}), 418
+
+    return make_response(message_data, 200)
