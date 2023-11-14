@@ -1,5 +1,7 @@
 from flask import Flask
 import os
+from config import Config
+
 
 #Create the flask instance
 app = Flask(__name__)
@@ -9,10 +11,9 @@ app = Flask(__name__)
 from flask_cors import CORS
 CORS(app, origins=os.getenv("FRONT_URL"))
 
-# #Configuration for logg
-import logging
 # Configurate logger level
-logging.basicConfig(level=logging.DEBUG)
+import logging
+logging.basicConfig(level=Config.LOGGING_LEVEL)
 
 # Create logger object
 logger = logging.getLogger('myapp')
@@ -26,7 +27,6 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
 #Gets our Config object into the instance configuration
-from config import Config
 app.config.from_object(Config)
 
 #Integrate SQLAlchemy to database and FlaskMigrate to migrations
@@ -41,12 +41,13 @@ from flask_login import LoginManager
 login_manager = LoginManager()
 login_manager.init_app(app)
 # from src.models.user import User #Import models to migrate them
+# from src.models.organization import Organization
+# from src.models.chat import Chat
+from src.models import *
+
 
 #Add routes from blueprints to app
 from src.routes import user_routes, auth_routes, webhook_routes
-# from src.routes import user_routes
-# from src.routes import auth_routes
-# from src.routes import webhook_routes
 app.register_blueprint(user_routes)
 app.register_blueprint(auth_routes)
 app.register_blueprint(webhook_routes)
