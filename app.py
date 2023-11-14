@@ -13,14 +13,14 @@ CORS(app, origins=os.getenv("FRONT_URL"))
 
 # Configurate logger level
 import logging
-logging.basicConfig(level=Config.LOGGING_LEVEL)
+logging.basicConfig(level=Config.LOG_LEVEL)
 
 # Create logger object
 logger = logging.getLogger('myapp')
 
 # Agrega un manejador de archivos para el registro
 file_handler = logging.FileHandler('app.log')
-log_level = os.getenv('LOG_LEVEL', 'INFO')
+log_level = Config.LOG_LEVEL
 file_handler.setLevel(logging.getLevelName(log_level))
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 file_handler.setFormatter(formatter)

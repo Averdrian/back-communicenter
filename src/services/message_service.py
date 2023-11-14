@@ -35,11 +35,12 @@ class MessageService:
     def getMessageData(message_json):
         message_data = message_json['entry'][0]['changes'][0]['value']['messages'][0]    
         message_data['name'] = message_json['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name']
-
+        message_data['content'] = message_data[message_data['type']]
         message_data['phone_number'] = message_data['from']
         message_data['wamid'] = message_data['id']
         del message_data['from']
         del message_data['id']
+        del message_data[message_data['type']]
 
         return message_data
 
