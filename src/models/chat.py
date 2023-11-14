@@ -8,8 +8,9 @@ class Chat(db.Model):
     last_message_at = db.Column(db.DateTime, unique=False, nullable=True)
     organization_id = db.Column(db.BigInteger, db.ForeignKey('organization.id'), nullable=True)
     status = db.Column(db.SmallInteger, unique=False, nullable=False)
-    
-    
+    country = db.Column(db.String(5), unique=False, nullable=True)
+    messages = db.relationship('Message', backref='chat', cascade='all, delete-orphan')
+
     def __init__(self, phone, status):
         self.phone = phone
         self.status = status

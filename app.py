@@ -40,9 +40,8 @@ migrate = Migrate(app, db, directory='src/migrations')
 from flask_login import LoginManager
 login_manager = LoginManager()
 login_manager.init_app(app)
-# from src.models.user import User #Import models to migrate them
-# from src.models.organization import Organization
-# from src.models.chat import Chat
+
+#Import models to let the migrations
 from src.models import *
 
 

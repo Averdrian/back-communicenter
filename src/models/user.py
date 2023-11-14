@@ -7,6 +7,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(80), unique=False, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(72), unique=False, nullable=False)
+    organization_id = db.Column(db.BigInteger, db.ForeignKey("organization.id", on_delete='CASCADE'))
 
     def __init__(self, username, email, password):
         self.username = username
