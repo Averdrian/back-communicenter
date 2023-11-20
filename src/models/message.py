@@ -4,7 +4,7 @@ from datetime import datetime
 
 class Message(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
-    chat_id = db.Column(db.BigInteger, db.ForeignKey('chat.id', on_delete='CASCADE'), nullable=False)
+    chat_id = db.Column(db.BigInteger, db.ForeignKey('chat.id', ondelete='CASCADE'), nullable=False)
     user_id = db.Column(db.BigInteger, db.ForeignKey("user.id"), nullable=True)
     type = db.Column(db.SmallInteger, nullable=False)
     content = db.Column(db.Text, nullable=False)
