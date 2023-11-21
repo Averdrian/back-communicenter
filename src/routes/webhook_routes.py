@@ -1,10 +1,7 @@
 from flask import Blueprint, request, jsonify, make_response
-from flask_login import login_required
 from marshmallow import Schema, fields, ValidationError
 from app import logger
-from src.controllers.webhook_controller import WebhookController
-from src.services.message_service import MessageService
-import json
+from src.controllers import WebhookController, MessageController
 
 webhook_routes = Blueprint('webhook_routes', __name__)
 
@@ -29,9 +26,5 @@ def verify_token():
 
 @webhook_routes.route('/webhook', methods=['POST'])
 def recieve_message():
-
-    message_data = MessageService.getMessageData(request.json)
-
-    logger.debug(message_data)
-
-    return make_response(message_data, 200)
+    response = MessageController.receiveMessage(request.json)
+    return make_response(response)
