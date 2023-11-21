@@ -1,10 +1,11 @@
 import os
 import requests
-from app import logger
-from src.models import Chat
+from app import db, logger
+from src.models import Chat, Message
 
 class MessageService:
     
+    #TODO: TRATAR LOS MENSAJES DE LOCATION, CONTACTS
     
     #Main function for all received messages
     def messageReceived(message_json):
@@ -17,10 +18,22 @@ class MessageService:
         if chat:
             logger.debug("hay chat")
             
+            
         else:
             logger.debug("no hay chat")
+            chat = Chat(phone=message_data['phone_number'], whatsapp_name=message_data['name'])
+            db.session.add(chat)
+            # db.session.commit()
         
-        return message_data, 201
+        #Create message
+        message = Message(chat.id, message_data)
+        db.session.add(message)
+
+        logger.info({column.name: getattr(message, column.name) for column in message.__table__.columns})
+        
+        db.session.commit()
+        
+        return message_data
         
 
     #This functions recieves the raw json from entring messages, and it returns a simplified object with all relevant mesasge data
@@ -28,16 +41,34 @@ class MessageService:
         message_data = message_json['entry'][0]['changes'][0]['value']['messages'][0]    
         message_data['name'] = message_json['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name']
         
+        logger.info(message_data)
+        
         #Message supported, move contents from type index to 'content'
         if message_data['type'] != 'unsupported' :
             message_data['content'] = message_data[message_data['type']]
             del message_data[message_data['type']]
+            
+            #Set to message all possible index of them 
+            if 'body' in message_data['content']:
+                message_data['content']['message'] = message_data['content']['body']
+                del message_data['content']['body']
+            elif 'caption' in message_data['content']:
+                message_data['content']['message'] = message_data['content']['caption']
+                del message_data['content']['caption']
+            elif 'emoji' in message_data['content']:
+                message_data['content']['message'] = message_data['content']['emoji']
+                del message_data['content']['emoji']    
+            else:
+                message_data['content']['message'] = None
+            
+            
         #Message unsupported, content is title from error
         else:
             message_data['content'] = {'error': message_data['errors'][0]['title']}
             message_data['type'] = 'unsupported'
             del message_data['errors']
         
+        message_data['timestamp'] = int(message_data['timestamp'])
         message_data['phone_number'] = message_data['from']
         message_data['wamid'] = message_data['id']
         del message_data['from']

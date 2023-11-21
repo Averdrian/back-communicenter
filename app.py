@@ -29,6 +29,11 @@ logger.addHandler(file_handler)
 #Gets our Config object into the instance configuration
 app.config.from_object(Config)
 
+# Remove de automatic formatting for numbers (adding commas in thousands and above)
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'connect_args': {'options': '-c lc_numeric=C'},
+}
+
 #Integrate SQLAlchemy to database and FlaskMigrate to migrations
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate

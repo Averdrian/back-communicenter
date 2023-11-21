@@ -1,6 +1,6 @@
 from app import db
 from datetime import datetime
-from enum import Enum
+from enum import Enum   
 
 class MessageType(Enum):
         TEXT = 1
@@ -14,14 +14,18 @@ class MessageType(Enum):
         REACTION = 9
         UNSUPPORTED = 10
 
+#TODO: MENSAJE QUE REFERENCIE OTRO MENSAJE, O DARIA MUCHO PROBLEMA? -> PENSAR EN EL FRONT
+
 class Message(db.Model):
     
     id = db.Column(db.BigInteger, primary_key=True)
     chat_id = db.Column(db.BigInteger, db.ForeignKey('chat.id', ondelete='CASCADE'), nullable=False)
     user_id = db.Column(db.BigInteger, db.ForeignKey("user.id"), nullable=True)
-    type = db.Column(db.Enum(MessageType), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    wamid = db.Column(db.String(50), nullable=True)
+    type = db.Column(db.SmallInteger, nullable=False)
+    message = db.Column(db.Text, nullable=True)
+    media_id = db.Column(db.BigInteger, nullable=True)
+    mime_type = db.Column(db.String(20), nullable=True)
+    wamid = db.Column(db.String(100), nullable=True)
     sent_at = db.Column(db.DateTime, nullable=False)
     
     def __init__(self, chat_id, type, content):
@@ -30,10 +34,14 @@ class Message(db.Model):
         self.content = content
         self.sent_at = datetime.now()
         
-    # def __init__(self, message_data) :
-    #     # self.type = message_data.type
-        
-        
+    def __init__(self, chat_id, message_data) :
+        self.chat_id = chat_id
+        self.type = Message.getMessageType(message_data['type'])
+        self.message = message_data['content']['message']
+        self.media_id = message_data['content']['id'] if 'id' in message_data['content'] else None
+        self.mime_type = message_data['content']['mime_type'] if 'mime_type' in message_data['content'] else None
+        self.wamid = message_data['wamid']
+        self.sent_at = datetime.fromtimestamp(message_data['timestamp'])
         
     def getMessageType(message_type : str) -> MessageType :
         types = {
@@ -46,9 +54,9 @@ class Message(db.Model):
             'location': MessageType.LOCATION,
             'contacts' : MessageType.CONTACT,
             'reaction' : MessageType.REACTION,
-            'unsupported' : MessageType.UNSUPPORTED       
+            'unsupported' : MessageType.UNSUPPORTED
         }
-        return types[message_type] if types[message_type] else MessageType.UNSUPPORTED
+        return types[message_type].value if types[message_type] else MessageType.UNSUPPORTED.value
         
 
 
