@@ -4,43 +4,26 @@ from app import logger
 class MessageService:
 
 
-    # def getWhatsAppName(message_data):
-    #     return message_data['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name']
-
-    # def getPhoneNumber(message_data):
-    #     return message_data['entry'][0]['changes'][0]['value']['messages'][0]['from']
-    
-    # def getWamid(message_data):
-    #     return message_data['entry'][0]['changes'][0]['value']['messages'][0]['id']
-    
-    # def getTimeStamp(message_data):
-    #     return message_data['entry'][0]['changes'][0]['value']['messages'][0]['timestamp']
-    
-    # def getMessageType(message_data):
-    #     return message_data['entry'][0]['changes'][0]['value']['messages'][0]['type']
-    
-    # def getMessageContextWamid(message_data):
-    #     return message_data['entry'][0]['changes'][0]['value']['messages'][0]['context']['id']
-    
-    # def getMessageObject(message_data):
-    #     message_type = MessageService.getMessageType(message_data)
-    #     return message_data['entry'][0]['changes'][0]['value']['messages'][0][message_type]
-    
-    # def getFileMimeType(message_object):
-    #     return message_object['mime_type'] if 'mime_type' in message_object else ''
-    
-    # def getMediaId(message_object):
-    #     return message_object['id']
-
     def getMessageData(message_json):
         message_data = message_json['entry'][0]['changes'][0]['value']['messages'][0]    
         message_data['name'] = message_json['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name']
-        message_data['content'] = message_data[message_data['type']]
+        
+        #Message supported, move contents from type index to 'content'
+        if message_data['type'] != 'unsupported' :
+            message_data['content'] = message_data[message_data['type']]
+            del message_data[message_data['type']]
+        #Message unsupported, content is title from error
+        else:
+            logger.info(message_data['errors'])
+            message_data['content'] = {'error': message_data['errors'][0]['title']}
+            message_data['type'] = 'unsupported'
+            del message_data['errors']
+        
         message_data['phone_number'] = message_data['from']
         message_data['wamid'] = message_data['id']
         del message_data['from']
         del message_data['id']
-        del message_data[message_data['type']]
+        
 
         return message_data
 
