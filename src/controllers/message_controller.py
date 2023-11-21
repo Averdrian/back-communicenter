@@ -11,6 +11,7 @@ class MessageController:
             return response, 201
         except Exception as error:
             logger.error(str(error))
+            raise(error)
             return {'error': str(error)}, 500
    
     

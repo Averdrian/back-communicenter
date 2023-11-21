@@ -11,26 +11,18 @@ class MessageService:
     def messageReceived(message_json):
         
         message_data = MessageService.getMessageData(message_json)
-        logger.info(message_data)
+        
         chat = Chat.query.filter(Chat.phone == message_data['phone_number']).first()
-        
-        
-        if chat:
-            logger.debug("hay chat")
-            
-            
-        else:
-            logger.debug("no hay chat")
+    
+        #If chat does not exist we create it
+        if not chat:
             chat = Chat(phone=message_data['phone_number'], whatsapp_name=message_data['name'])
             db.session.add(chat)
-            # db.session.commit()
+            db.session.commit()
         
         #Create message
         message = Message(chat.id, message_data)
-        db.session.add(message)
-
-        logger.info({column.name: getattr(message, column.name) for column in message.__table__.columns})
-        
+        db.session.add(message)        
         db.session.commit()
         
         return message_data
@@ -38,25 +30,30 @@ class MessageService:
 
     #This functions recieves the raw json from entring messages, and it returns a simplified object with all relevant mesasge data
     def getMessageData(message_json):
+                
         message_data = message_json['entry'][0]['changes'][0]['value']['messages'][0]    
         message_data['name'] = message_json['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name']
-        
-        logger.info(message_data)
-        
+                
         #Message supported, move contents from type index to 'content'
         if message_data['type'] != 'unsupported' :
             message_data['content'] = message_data[message_data['type']]
             del message_data[message_data['type']]
+            logger.debug(type(message_data['content']))
+            
             
             #Set to message all possible index of them 
-            if 'body' in message_data['content']:
-                message_data['content']['message'] = message_data['content']['body']
+            if isinstance(message_data['content'], list): #Contacts
+                message_data['content'] = message_data['content'][0]
+                message_text = 'Name: ' + message_data['content']['name']['formatted_name'] + ' | Phone: ' + message_data['content']['phones'][0]['wa_id']
+                message_data['content']['message'] = message_text
+            elif 'body' in message_data['content']:
+                message_data['content']['message'] = message_data['content']['body'] #Message
                 del message_data['content']['body']
-            elif 'caption' in message_data['content']:
+            elif 'caption' in message_data['content']: #Media types (document, video, photo)
                 message_data['content']['message'] = message_data['content']['caption']
                 del message_data['content']['caption']
             elif 'emoji' in message_data['content']:
-                message_data['content']['message'] = message_data['content']['emoji']
+                message_data['content']['message'] = message_data['content']['emoji'] #Reaction
                 del message_data['content']['emoji']    
             else:
                 message_data['content']['message'] = None

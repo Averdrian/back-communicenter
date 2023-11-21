@@ -27,13 +27,7 @@ class Message(db.Model):
     mime_type = db.Column(db.String(20), nullable=True)
     wamid = db.Column(db.String(100), nullable=True)
     sent_at = db.Column(db.DateTime, nullable=False)
-    
-    def __init__(self, chat_id, type, content):
-        self.chat_id = chat_id
-        self.type = type
-        self.content = content
-        self.sent_at = datetime.now()
-        
+     
     def __init__(self, chat_id, message_data) :
         self.chat_id = chat_id
         self.type = Message.getMessageType(message_data['type'])
@@ -56,7 +50,7 @@ class Message(db.Model):
             'reaction' : MessageType.REACTION,
             'unsupported' : MessageType.UNSUPPORTED
         }
-        return types[message_type].value if types[message_type] else MessageType.UNSUPPORTED.value
+        return types[message_type].value if message_type in types else MessageType.UNSUPPORTED.value
         
 
 
