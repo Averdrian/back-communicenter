@@ -4,13 +4,13 @@ from app import db, logger
 from src.models import Chat, Message
 
 class MessageService:
-    
-    #TODO: TRATAR LOS MENSAJES DE LOCATION, CONTACTS
-    
+        
     #Main function for all received messages
     def messageReceived(message_json):
         
         message_data = MessageService.getMessageData(message_json)
+        
+        logger.debug(message_data)
         
         chat = Chat.query.filter(Chat.phone == message_data['phone_number']).first()
     
@@ -37,25 +37,34 @@ class MessageService:
         #Message supported, move contents from type index to 'content'
         if message_data['type'] != 'unsupported' :
             message_data['content'] = message_data[message_data['type']]
-            del message_data[message_data['type']]
-            logger.debug(type(message_data['content']))
-            
+            del message_data[message_data['type']]            
             
             #Set to message all possible index of them 
             if isinstance(message_data['content'], list): #Contacts
                 message_data['content'] = message_data['content'][0]
                 message_text = 'Name: ' + message_data['content']['name']['formatted_name'] + ' | Phone: ' + message_data['content']['phones'][0]['wa_id']
                 message_data['content']['message'] = message_text
-            elif 'body' in message_data['content']:
-                message_data['content']['message'] = message_data['content']['body'] #Message
+            
+            elif 'latitude' in message_data['content']: #Location
+                message_temp = "Address{{{addr}}} ".format(addr=message_data['content']['address']) if 'address' in message_data['content'] else ''
+                message_temp += "Name{{{name}}} ".format(name=message_data['content']['name']) if 'name' in message_data['content'] else ''
+                message_temp += "Url{{{url}}} ".format(url=message_data['content']['url']) if 'url' in message_data['content'] else ''
+                message_temp += "Message{{{message}}}".format(message=message_data['content']['message']) if 'message' in message_data['content'] else ''
+                message_data['content']['message'] =  "{{{latitude},{longitude}}} {message}".format(latitude=message_data['content']['latitude'], longitude=message_data['content']['longitude'], message=message_temp).rstrip()
+                
+            
+            elif 'body' in message_data['content']: #Message
+                message_data['content']['message'] = message_data['content']['body']
                 del message_data['content']['body']
-            elif 'caption' in message_data['content']: #Media types (document, video, photo)
+            
+            elif 'caption' in message_data['content']: #Message attached to media types (document, video, photo)
                 message_data['content']['message'] = message_data['content']['caption']
                 del message_data['content']['caption']
-            elif 'emoji' in message_data['content']:
-                message_data['content']['message'] = message_data['content']['emoji'] #Reaction
+                
+            elif 'emoji' in message_data['content']: #Reaction
+                message_data['content']['message'] = message_data['content']['emoji'] 
                 del message_data['content']['emoji']    
-            else:
+            else: #No message found
                 message_data['content']['message'] = None
             
             

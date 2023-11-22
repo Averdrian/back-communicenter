@@ -14,8 +14,6 @@ class MessageType(Enum):
         REACTION = 9
         UNSUPPORTED = 10
 
-#TODO: MENSAJE QUE REFERENCIE OTRO MENSAJE, O DARIA MUCHO PROBLEMA? -> PENSAR EN EL FRONT
-
 class Message(db.Model):
     
     id = db.Column(db.BigInteger, primary_key=True)
