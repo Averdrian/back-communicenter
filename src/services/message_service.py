@@ -20,6 +20,7 @@ class MessageService:
             db.session.add(chat)
             db.session.commit()
         
+        logger.info(message_data)
         #Create message
         message = Message(chat.id, message_data)
         db.session.add(message)        
@@ -70,7 +71,7 @@ class MessageService:
             
         #Message unsupported, content is title from error
         else:
-            message_data['content'] = {'error': message_data['errors'][0]['title']}
+            message_data['content'] = {'message': message_data['errors'][0]['title']}
             message_data['type'] = 'unsupported'
             del message_data['errors']
         
