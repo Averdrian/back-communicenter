@@ -1,6 +1,8 @@
 from app import db
-from datetime import datetime
-from enum import Enum   
+from datetime import datetime, timedelta
+from enum import Enum
+from app import logger
+from src.models import Chat
 
 class MessageType(Enum):
         TEXT = 1
@@ -15,7 +17,7 @@ class MessageType(Enum):
         UNSUPPORTED = 10
 
 class Message(db.Model):
-    
+
     id = db.Column(db.BigInteger, primary_key=True)
     chat_id = db.Column(db.BigInteger, db.ForeignKey('chat.id', ondelete='CASCADE'), nullable=False)
     user_id = db.Column(db.BigInteger, db.ForeignKey("user.id"), nullable=True)
@@ -25,7 +27,7 @@ class Message(db.Model):
     mime_type = db.Column(db.String(20), nullable=True)
     wamid = db.Column(db.String(100), nullable=True)
     sent_at = db.Column(db.DateTime, nullable=False)
-     
+
     def __init__(self, chat_id, message_data) :
         self.chat_id = chat_id
         self.type = Message.getMessageType(message_data['type'])
@@ -34,7 +36,8 @@ class Message(db.Model):
         self.mime_type = message_data['content']['mime_type'] if 'mime_type' in message_data['content'] else None
         self.wamid = message_data['wamid']
         self.sent_at = datetime.fromtimestamp(message_data['timestamp'])
-        
+
+
     def getMessageType(message_type : str) -> MessageType :
         types = {
             'text': MessageType.TEXT,
@@ -49,8 +52,15 @@ class Message(db.Model):
             'unsupported' : MessageType.UNSUPPORTED
         }
         return types[message_type].value if message_type in types else MessageType.UNSUPPORTED.value
-        
 
-
-        
     
+    @staticmethod
+    def inserted(message):
+        chat = Chat.query.get(message.chat_id)
+        if chat:
+            chat.last_message_at = message.sent_at
+            logger.info(f"Chat last_message_at updated: {chat.last_message_at}")
+            if message.user_id is None:
+                chat.expires_at = message.sent_at + timedelta(days=1)
+                logger.info(f"Chat expires_at updated: {chat.expires_at}")
+            db.session.commit()

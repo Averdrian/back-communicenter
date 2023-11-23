@@ -9,9 +9,7 @@ class MessageService:
     def messageReceived(message_json):
         
         message_data = MessageService.getMessageData(message_json)
-        
-        logger.debug(message_data)
-        
+                
         chat = Chat.query.filter(Chat.phone == message_data['phone_number']).first()
     
         #If chat does not exist we create it
@@ -20,11 +18,11 @@ class MessageService:
             db.session.add(chat)
             db.session.commit()
         
-        logger.info(message_data)
         #Create message
         message = Message(chat.id, message_data)
-        db.session.add(message)        
+        db.session.add(message)    
         db.session.commit()
+        Message.inserted(message)
         
         return message_data
         
