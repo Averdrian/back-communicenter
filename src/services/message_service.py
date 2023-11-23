@@ -2,14 +2,20 @@ import os
 import requests
 from app import db, logger
 from src.models import Chat, Message
+from src.events import MessageEvents
 
 class MessageService:
+  
+    
+    def createMessage(chat_id, message_data):
+        message = Message(chat_id, message_data)
+        db.session.add(message)
+        db.session.commit()
+        MessageEvents.inserted(message)
         
-    #Main function for all received messages
-    def messageReceived(message_json):
+        return message
         
-        message_data = MessageService.getMessageData(message_json)
-                
+    def createOrUpdateChat(message_data):
         chat = Chat.query.filter(Chat.phone == message_data['phone_number']).first()
     
         #If chat does not exist we create it
@@ -17,15 +23,9 @@ class MessageService:
             chat = Chat(phone=message_data['phone_number'], whatsapp_name=message_data['name'])
             db.session.add(chat)
             db.session.commit()
-        
-        #Create message
-        message = Message(chat.id, message_data)
-        db.session.add(message)    
-        db.session.commit()
-        Message.inserted(message)
-        
-        return message_data
-        
+        return chat
+    
+    
 
     #This functions recieves the raw json from entring messages, and it returns a simplified object with all relevant mesasge data
     def getMessageData(message_json):

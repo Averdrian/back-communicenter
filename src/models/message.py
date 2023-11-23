@@ -52,15 +52,3 @@ class Message(db.Model):
             'unsupported' : MessageType.UNSUPPORTED
         }
         return types[message_type].value if message_type in types else MessageType.UNSUPPORTED.value
-
-    
-    @staticmethod
-    def inserted(message):
-        chat = Chat.query.get(message.chat_id)
-        if chat:
-            chat.last_message_at = message.sent_at
-            logger.info(f"Chat last_message_at updated: {chat.last_message_at}")
-            if message.user_id is None:
-                chat.expires_at = message.sent_at + timedelta(days=1)
-                logger.info(f"Chat expires_at updated: {chat.expires_at}")
-            db.session.commit()
