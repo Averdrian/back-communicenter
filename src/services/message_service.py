@@ -8,6 +8,7 @@ class MessageService:
   
     
     def createMessage(chat_id, message_data):
+        
         message = Message(chat_id, message_data)
         db.session.add(message)
         db.session.commit()
@@ -29,7 +30,7 @@ class MessageService:
 
     #This functions recieves the raw json from entring messages, and it returns a simplified object with all relevant mesasge data
     def getMessageData(message_json):
-                
+        
         message_data = message_json['entry'][0]['changes'][0]['value']['messages'][0]    
         message_data['name'] = message_json['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name']
                 
@@ -62,11 +63,16 @@ class MessageService:
                 
             elif 'emoji' in message_data['content']: #Reaction
                 message_data['content']['message'] = message_data['content']['emoji'] 
+                message_data['ref_wamid'] = message_data['content']['message_id']
                 del message_data['content']['emoji']    
             else: #No message found
                 message_data['content']['message'] = None
-            
-            
+        
+            #The message has a reference to other message
+            if 'context' in message_data:
+                message_data['ref_wamid'] = message_data['context']['id']
+                
+
         #Message unsupported, content is title from error
         else:
             message_data['content'] = {'message': message_data['errors'][0]['title']}

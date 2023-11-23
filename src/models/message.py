@@ -25,7 +25,8 @@ class Message(db.Model):
     message = db.Column(db.Text, nullable=True)
     media_id = db.Column(db.BigInteger, nullable=True)
     mime_type = db.Column(db.String(20), nullable=True)
-    wamid = db.Column(db.String(100), nullable=True)
+    wamid = db.Column(db.String(100), nullable=True, unique=True)
+    ref_wamid=db.Column(db.String(100), db.ForeignKey("message.wamid"), nullable=True, unique=False)
     sent_at = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, chat_id, message_data) :
@@ -36,6 +37,7 @@ class Message(db.Model):
         self.mime_type = message_data['content']['mime_type'] if 'mime_type' in message_data['content'] else None
         self.wamid = message_data['wamid']
         self.sent_at = datetime.fromtimestamp(message_data['timestamp'])
+        self.ref_wamid = message_data['ref_wamid'] if 'ref_wamid' in message_data else None
 
 
     def getMessageType(message_type : str) -> MessageType :

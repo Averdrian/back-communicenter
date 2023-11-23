@@ -2,7 +2,6 @@ from app import db
 from phone_iso3166.country import phone_country
 
 #TODO: Enumerado apra los status (MIRAR CONSTRUCTOR QUE USA 0 DE BASE)
-#TODO: Añadir fecha de expiracion del chat (recordar que last_message_at es general, necesitamos este para trackear el ultimo mensaje ENTRANTE)
 
 class Chat(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
