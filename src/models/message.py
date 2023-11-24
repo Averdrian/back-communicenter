@@ -40,6 +40,7 @@ class Message(db.Model):
 
     def __init__(self, chat_id, message_data) :
         self.chat_id = chat_id
+        self.user_id = message_data['user_id'] if 'user_id' in message_data else None
         self.type = Message.get_message_type(message_data['type'])
         self.message = message_data['content']['message'] if 'message' in message_data['content'] else None
         self.media_id = message_data['content']['id'] if 'id' in message_data['content'] else None

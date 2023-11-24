@@ -3,11 +3,13 @@ import requests
 from app import db, logger
 from src.models import Chat, Message
 from src.events import MessageEvents
+from datetime import datetime
+from src.utils.messages_utils import base_headers, graph_messages_url, base_graph_mesages_json
 
 class MessageService:
   
     
-    def create_message(chat_id, message_data):
+    def create_message_webhook(chat_id, message_data):
         
         message = Message(chat_id, message_data)
         db.session.add(message)
@@ -33,7 +35,7 @@ class MessageService:
         
         message_data = message_json['entry'][0]['changes'][0]['value']['messages'][0]    
         message_data['name'] = message_json['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name']
-                
+        
         #Message supported, move contents from type index to 'content'
         if message_data['type'] != 'unsupported' :
             message_data['content'] = message_data[message_data['type']]
@@ -51,7 +53,6 @@ class MessageService:
                 message_temp += "Url{{{url}}} ".format(url=message_data['content']['url']) if 'url' in message_data['content'] else ''
                 message_temp += "Message{{{message}}}".format(message=message_data['content']['message']) if 'message' in message_data['content'] else ''
                 message_data['content']['message'] =  "{{{latitude},{longitude}}} {message}".format(latitude=message_data['content']['latitude'], longitude=message_data['content']['longitude'], message=message_temp).rstrip()
-                
             
             elif 'body' in message_data['content']: #Message
                 message_data['content']['message'] = message_data['content']['body']
@@ -119,4 +120,67 @@ class MessageService:
             message.status = status_int
             db.session.add(message)
             db.session.commit()
+            
+    def can_send(message_json):
+        chat = Chat.query.get(message_json['chat_id'])
+        return chat.expires_at and datetime.now() < chat.expires_at
+    
+    def prepare_message_body(message_json):
+        if message_json['type'] == 'text':
+            ret_json = MessageService._prepare_text_message(message_json) 
+        elif message_json['type'] == 'media':
+            ret_json = base_graph_mesages_json.copy() #TODO: Media messages
         
+        #Phone number
+        chat = Chat.query.get(message_json['chat_id'])
+        ret_json['to'] = chat.phone
+        
+        # logger.debug(message_json)
+        logger.debug('context' in message_json)
+        
+        #The message responds to other
+        if 'context' in message_json:
+            logger.info("por que carajo entra")
+            wamid = Message.query.get(message_json['context']).wamid
+            if wamid: ret_json['context'] = {'message_id':wamid}
+        logger.debug(ret_json)
+        return ret_json
+    
+    
+    def send_message(send_json):
+        response = requests.post(url=graph_messages_url, json=send_json, headers=base_headers)
+        if 'error' in response.json() : return False, None
+        return True, response.json()['messages'][0]['id']
+    
+    def _prepare_text_message(message_json):
+        logger.info("base graph")
+        logger.info(base_graph_mesages_json)
+        ret_json = base_graph_mesages_json.copy()
+        logger.info("entra _prepare")
+        logger.info(ret_json)
+        ret_json['type'] = 'text'
+        ret_json['text'] = {
+            "preview_url" : True,
+            "body": message_json['body']
+        }
+        return ret_json
+    
+    def create_message_send(message_json, wamid):
+        
+        message_data = {
+                'content':{
+                    'message': message_json['body'],
+                },
+                'user_id' : message_json['user_id'], #TODO: Cuando este bien hecho el auth , tiene que ser el usuario que lo haya creado, o un usuario bot
+                'type': message_json['type'],
+                'wamid': wamid,
+                'timestamp': datetime.now().timestamp()
+            }
+        
+        if 'context' in message_json:
+            ref_wamid = Message.query.get(message_json['context']).wamid
+            if wamid: message_data['ref_wamid'] = ref_wamid
+        
+        message = Message(message_json['chat_id'],message_data)
+        db.session.add(message)
+        db.session.commit()

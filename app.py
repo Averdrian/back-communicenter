@@ -51,11 +51,12 @@ from src.models import *
 
 
 #Add routes from blueprints to app
-from src.routes import user_routes, auth_routes, webhook_routes, message_routes
+from src.routes import user_routes, auth_routes, webhook_routes, message_routes #Import blueprints
+from src.routes import message_prefix #Import prefixes to routes
 app.register_blueprint(user_routes)
 app.register_blueprint(auth_routes)
 app.register_blueprint(webhook_routes)
-app.register_blueprint(message_routes)
+app.register_blueprint(message_routes, url_prefix=message_prefix)
 
 #Run the application
 if __name__ == '__main__':
