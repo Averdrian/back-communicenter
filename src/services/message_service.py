@@ -7,7 +7,7 @@ from src.events import MessageEvents
 class MessageService:
   
     
-    def createMessage(chat_id, message_data):
+    def create_message(chat_id, message_data):
         
         message = Message(chat_id, message_data)
         db.session.add(message)
@@ -16,7 +16,7 @@ class MessageService:
         
         return message
         
-    def createOrUpdateChat(message_data):
+    def create_or_update_chat(message_data):
         chat = Chat.query.filter(Chat.phone == message_data['phone_number']).first()
     
         #If chat does not exist we create it
@@ -29,7 +29,7 @@ class MessageService:
     
 
     #This functions recieves the raw json from entring messages, and it returns a simplified object with all relevant mesasge data
-    def getMessageData(message_json):
+    def get_message_data(message_json):
         
         message_data = message_json['entry'][0]['changes'][0]['value']['messages'][0]    
         message_data['name'] = message_json['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name']
@@ -89,11 +89,34 @@ class MessageService:
         return message_data
 
 
-    def getMediaUrl(media_id):
+    def get_media_url(media_id):
         url = 'https://graph.facebook.com/' + os.getenv('GRAPH_VERSION') + '/' + media_id
         headers =  {'Authorization': 'Bearer ' + os.getenv('WA_API_KEY')}
         return requests.get(url, headers=headers).content
         
-    def getMediaImage(media_url):
+    def get_media_image(media_url):
         headers = {'Authorization': 'Bearer ' + os.getenv('WA_API_KEY')}
         return requests.get(media_url, headers=headers)
+    
+    
+    
+    def get_status_data(status_json):
+        status = status_json['entry'][0]['changes'][0]['value']['statuses'][0]['status']
+        wamid = status_json['entry'][0]['changes'][0]['value']['statuses'][0]['id']
+        return status, wamid
+    
+    
+    
+    def update_status(wamid, status):
+        
+        #Get the value of status and the message
+        status_int = Message.get_message_status(status)
+        message = Message.query.filter_by(wamid = wamid).first()
+        
+        #If messages exists and the new status is above the previous, we update it
+        #Its common that we dont hook the status in order, thats why we make the second condition 
+        if message and message.status < status_int:
+            message.status = status_int
+            db.session.add(message)
+            db.session.commit()
+        

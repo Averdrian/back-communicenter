@@ -51,10 +51,11 @@ from src.models import *
 
 
 #Add routes from blueprints to app
-from src.routes import user_routes, auth_routes, webhook_routes
+from src.routes import user_routes, auth_routes, webhook_routes, message_routes
 app.register_blueprint(user_routes)
 app.register_blueprint(auth_routes)
 app.register_blueprint(webhook_routes)
+app.register_blueprint(message_routes)
 
 #Run the application
 if __name__ == '__main__':

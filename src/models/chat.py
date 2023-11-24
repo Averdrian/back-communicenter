@@ -1,7 +1,7 @@
 from app import db
 from phone_iso3166.country import phone_country
 
-#TODO: Enumerado apra los status (MIRAR CONSTRUCTOR QUE USA 0 DE BASE)
+#TODO: Enumerado para los status (MIRAR CONSTRUCTOR QUE USA 0 DE BASE)
 
 class Chat(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
