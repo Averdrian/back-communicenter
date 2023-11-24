@@ -43,7 +43,6 @@ class MessageController:
             
             MessageService.create_message_send(message_json, wamid)
             
-            
             return {'success': True}, 201
         except Exception as error:
             logger.error(str(error))

@@ -1,7 +1,7 @@
 import os
 import requests
 from app import db, logger
-from src.models import Chat, Message
+from src.models import Chat, Message, MessageStatus
 from src.events import MessageEvents
 from datetime import datetime
 from src.utils.messages_utils import base_headers, graph_messages_url, base_graph_mesages_json
@@ -35,6 +35,7 @@ class MessageService:
         
         message_data = message_json['entry'][0]['changes'][0]['value']['messages'][0]    
         message_data['name'] = message_json['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name']
+        message_data['status'] = MessageStatus.DELIVERED.value
         
         #Message supported, move contents from type index to 'content'
         if message_data['type'] != 'unsupported' :

@@ -48,7 +48,7 @@ class Message(db.Model):
         self.wamid = message_data['wamid']
         self.sent_at = datetime.fromtimestamp(message_data['timestamp'])
         self.ref_wamid = message_data['ref_wamid'] if 'ref_wamid' in message_data else None
-        
+        self.status = message_data['status'] if 'status' in message_data else MessageStatus.PENDING.value
 
     @staticmethod
     def get_message_type(message_type : str) -> MessageType :
