@@ -9,9 +9,9 @@ from src.utils.messages_utils import base_headers, graph_messages_url, base_grap
 class MessageService:
   
     
-    def create_message_webhook(chat_id, message_data):
+    def create_message(message_data):
         
-        message = Message(chat_id, message_data)
+        message = Message(message_data)
         db.session.add(message)
         db.session.commit()
         MessageEvents.inserted(message)
@@ -33,61 +33,61 @@ class MessageService:
     #This functions recieves the raw json from entring messages, and it returns a simplified object with all relevant mesasge data
     def get_message_data(message_json):
         
-        message_data = message_json['entry'][0]['changes'][0]['value']['messages'][0]    
-        message_data['name'] = message_json['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name']
+        me_json = message_json['entry'][0]['changes'][0]['value']['messages'][0]
+        
+        message_data = {}
         message_data['status'] = MessageStatus.DELIVERED.value
+        message_data['name'] = message_json['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name']
+        message_data['type'] = me_json['type']
         
         #Message supported, move contents from type index to 'content'
-        if message_data['type'] != 'unsupported' :
-            message_data['content'] = message_data[message_data['type']]
-            del message_data[message_data['type']]            
+        if me_json['type'] != 'unsupported' :
+            me_json['content'] = me_json[me_json['type']]
             
             #Set to message all possible index of them 
-            if isinstance(message_data['content'], list): #Contacts
-                message_data['content'] = message_data['content'][0]
-                message_text = 'Name: ' + message_data['content']['name']['formatted_name'] + ' | Phone: ' + message_data['content']['phones'][0]['wa_id']
-                message_data['content']['message'] = message_text
-            
-            elif 'latitude' in message_data['content']: #Location
-                message_temp = "Address{{{addr}}} ".format(addr=message_data['content']['address']) if 'address' in message_data['content'] else ''
-                message_temp += "Name{{{name}}} ".format(name=message_data['content']['name']) if 'name' in message_data['content'] else ''
-                message_temp += "Url{{{url}}} ".format(url=message_data['content']['url']) if 'url' in message_data['content'] else ''
-                message_temp += "Message{{{message}}}".format(message=message_data['content']['message']) if 'message' in message_data['content'] else ''
-                message_data['content']['message'] =  "{{{latitude},{longitude}}} {message}".format(latitude=message_data['content']['latitude'], longitude=message_data['content']['longitude'], message=message_temp).rstrip()
-            
-            elif 'body' in message_data['content']: #Message
-                message_data['content']['message'] = message_data['content']['body']
-                del message_data['content']['body']
-            
-            elif 'caption' in message_data['content']: #Message attached to media types (document, video, photo)
-                message_data['content']['message'] = message_data['content']['caption']
-                del message_data['content']['caption']
+            if isinstance(me_json['content'], list): #Contacts
+                me_json['content'] = me_json['content'][0]
+                logger.debug(me_json['content'])
                 
-            elif 'emoji' in message_data['content']: #Reaction
-                message_data['content']['message'] = message_data['content']['emoji'] 
-                message_data['ref_wamid'] = message_data['content']['message_id']
-                del message_data['content']['emoji']    
+                message_text = 'Name: ' + me_json['content']['name']['formatted_name'] + ' | Phone: ' + (me_json['content']['phones'][0]['wa_id'] if 'phones' in me_json['content'] else 'UNKNOWN')
+                message_data['message'] = message_text
+            
+            elif 'latitude' in me_json['content']: #Location
+                message_temp = "Address{{{addr}}} ".format(addr=me_json['content']['address']) if 'address' in me_json['content'] else ''
+                message_temp += "Name{{{name}}} ".format(name=me_json['content']['name']) if 'name' in me_json['content'] else ''
+                message_temp += "Url{{{url}}} ".format(url=me_json['content']['url']) if 'url' in me_json['content'] else ''
+                message_temp += "Message{{{message}}}".format(message=me_json['content']['message']) if 'message' in me_json['content'] else ''
+                message_data['message'] = "{{{latitude},{longitude}}} {message}".format(latitude=me_json['content']['latitude'], longitude=me_json['content']['longitude'], message=message_temp).rstrip()
+            
+            elif 'body' in me_json['content']: #Message
+                message_data['message'] = me_json['content']['body']
+            
+            elif 'caption' in me_json['content']: #Message attached to media types (document, video, photo)
+                message_data['message'] = me_json['content']['caption']
+                message_data['media_id'] = me_json['content']['id']
+                message_data['mime_type'] = me_json['content']['mime_type']
+            
+            elif 'emoji' in me_json['content']: #Reaction
+                message_data['message'] = me_json['content']['emoji']
+                message_data['ref_wamid'] = me_json['content']['message_id']
+            
             else: #No message found
-                message_data['content']['message'] = None
-        
+                message_data['message'] = None
+            
             #The message has a reference to other message
-            if 'context' in message_data:
-                message_data['ref_wamid'] = message_data['context']['id']
-                
+            if 'context' in me_json:
+                me_json['ref_wamid'] = me_json['context']['id']
+                message_data['ref_wamid'] = me_json['context']['id']
 
         #Message unsupported, content is title from error
         else:
-            message_data['content'] = {'message': message_data['errors'][0]['title']}
+            message_data['message'] = me_json['errors'][0]['title']
             message_data['type'] = 'unsupported'
-            del message_data['errors']
+            
+        message_data['timestamp'] = int(me_json['timestamp'])
+        message_data['phone_number'] = me_json['from']
+        message_data['wamid'] = me_json['id']
         
-        message_data['timestamp'] = int(message_data['timestamp'])
-        message_data['phone_number'] = message_data['from']
-        message_data['wamid'] = message_data['id']
-        del message_data['from']
-        del message_data['id']
-        
-
         return message_data
 
 
@@ -136,52 +136,24 @@ class MessageService:
         chat = Chat.query.get(message_json['chat_id'])
         ret_json['to'] = chat.phone
         
-        # logger.debug(message_json)
-        logger.debug('context' in message_json)
-        
         #The message responds to other
         if 'context' in message_json:
-            logger.info("por que carajo entra")
             wamid = Message.query.get(message_json['context']).wamid
             if wamid: ret_json['context'] = {'message_id':wamid}
-        logger.debug(ret_json)
         return ret_json
     
     
     def send_message(send_json):
         response = requests.post(url=graph_messages_url, json=send_json, headers=base_headers)
         if 'error' in response.json() : return False, None
+        
         return True, response.json()['messages'][0]['id']
     
     def _prepare_text_message(message_json):
-        logger.info("base graph")
-        logger.info(base_graph_mesages_json)
         ret_json = base_graph_mesages_json.copy()
-        logger.info("entra _prepare")
-        logger.info(ret_json)
         ret_json['type'] = 'text'
         ret_json['text'] = {
             "preview_url" : True,
-            "body": message_json['body']
+            "body": message_json['message']
         }
         return ret_json
-    
-    def create_message_send(message_json, wamid):
-        
-        message_data = {
-                'content':{
-                    'message': message_json['body'],
-                },
-                'user_id' : message_json['user_id'], #TODO: Cuando este bien hecho el auth , tiene que ser el usuario que lo haya creado, o un usuario bot
-                'type': message_json['type'],
-                'wamid': wamid,
-                'timestamp': datetime.now().timestamp()
-            }
-        
-        if 'context' in message_json:
-            ref_wamid = Message.query.get(message_json['context']).wamid
-            if wamid: message_data['ref_wamid'] = ref_wamid
-        
-        message = Message(message_json['chat_id'],message_data)
-        db.session.add(message)
-        db.session.commit()

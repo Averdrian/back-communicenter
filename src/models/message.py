@@ -38,15 +38,15 @@ class Message(db.Model):
     ref_wamid=db.Column(db.String(100), db.ForeignKey("message.wamid"), nullable=True, unique=False)
     sent_at = db.Column(db.DateTime, nullable=False)
 
-    def __init__(self, chat_id, message_data) :
-        self.chat_id = chat_id
+    def __init__(self, message_data) :
+        self.chat_id = message_data['chat_id']
         self.user_id = message_data['user_id'] if 'user_id' in message_data else None
         self.type = Message.get_message_type(message_data['type'])
-        self.message = message_data['content']['message'] if 'message' in message_data['content'] else None
-        self.media_id = message_data['content']['id'] if 'id' in message_data['content'] else None
-        self.mime_type = message_data['content']['mime_type'] if 'mime_type' in message_data['content'] else None
+        self.message = message_data['message'] if 'message' in message_data else None
+        self.media_id = message_data['media_id'] if 'media_id' in message_data else None
+        self.mime_type = message_data['mime_type'] if 'mime_type' in message_data else None
         self.wamid = message_data['wamid']
-        self.sent_at = datetime.fromtimestamp(message_data['timestamp'])
+        self.sent_at = datetime.fromtimestamp(message_data['timestamp']) if 'timestamp' in message_data else datetime.now()
         self.ref_wamid = message_data['ref_wamid'] if 'ref_wamid' in message_data else None
         self.status = message_data['status'] if 'status' in message_data else MessageStatus.PENDING.value
 
