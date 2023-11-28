@@ -1,6 +1,6 @@
 import os
 import requests
-from app import db, logger
+from database import db
 from src.models import Chat, Message, MessageStatus
 from src.events import MessageEvents
 from datetime import datetime
@@ -46,9 +46,7 @@ class MessageService:
             
             #Set to message all possible index of them 
             if isinstance(me_json['content'], list): #Contacts
-                me_json['content'] = me_json['content'][0]
-                logger.debug(me_json['content'])
-                
+                me_json['content'] = me_json['content'][0]                
                 message_text = 'Name: ' + me_json['content']['name']['formatted_name'] + ' | Phone: ' + (me_json['content']['phones'][0]['wa_id'] if 'phones' in me_json['content'] else 'UNKNOWN')
                 message_data['message'] = message_text
             

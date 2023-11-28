@@ -2,7 +2,6 @@ from flask import Blueprint, request, jsonify, make_response
 from flask_login import login_required
 from marshmallow import Schema, fields, ValidationError
 from src.controllers.auth_controller import AuthController
-from app import logger
 
 auth_routes = Blueprint('auth_routes', __name__)
 

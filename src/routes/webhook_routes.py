@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify, make_response
 from marshmallow import Schema, fields, ValidationError
-from app import logger
 from src.controllers import WebhookController, MessageController
 
 webhook_routes = Blueprint('webhook_routes', __name__)

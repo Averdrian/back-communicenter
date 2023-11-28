@@ -1,7 +1,6 @@
-from app import db
+from database import db
 from datetime import datetime, timedelta
 from enum import Enum
-from app import logger
 from src.models import Chat
 
 class MessageType(Enum):

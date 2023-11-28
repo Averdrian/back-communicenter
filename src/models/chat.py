@@ -1,4 +1,4 @@
-from app import db
+from database import db
 from phone_iso3166.country import phone_country
 
 #TODO: Enumerado para los status (MIRAR CONSTRUCTOR QUE USA 0 DE BASE)

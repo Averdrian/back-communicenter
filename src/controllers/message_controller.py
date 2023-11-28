@@ -1,5 +1,6 @@
 from src.services import MessageService
-from app import logger, db
+from database import db
+from settings import logger
 
 class MessageController:
     
@@ -34,8 +35,10 @@ class MessageController:
 
     def send_message(message_json):
         
+        
+        
         try:
-            if not MessageService.can_send(message_json) : return {'success' : False, 'error': 'The chat is expired'}
+            if not MessageService.can_send(message_json) : return {'success' : False, 'error': 'The chat is expired'}, 403
             
             send_json = MessageService.prepare_message_body(message_json)
             success, wamid = MessageService.send_message(send_json)

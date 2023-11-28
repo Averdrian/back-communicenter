@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields, ValidationError
 from flask import Blueprint, request, jsonify, make_response
 
-from src.controllers.user_controller import UserController
+from src.controllers import UserController
 
 user_routes = Blueprint('user_routes', __name__)
 
