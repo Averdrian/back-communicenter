@@ -10,6 +10,7 @@ class MessageController:
             message_data = MessageService.get_message_data(message_json)
             chat = MessageService.create_or_update_chat(message_data)
             message_data['chat_id'] = chat.id
+
             MessageService.create_message(message_data)
             
             return {'success': True}, 201

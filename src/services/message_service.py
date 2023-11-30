@@ -5,6 +5,7 @@ from src.models import Chat, Message, MessageStatus
 from src.events import MessageEvents
 from datetime import datetime
 from src.utils.messages_utils import base_headers, graph_messages_url, base_graph_messages_json
+from settings import logger
 
 class MessageService:
   
@@ -60,8 +61,8 @@ class MessageService:
             elif 'body' in me_json['content']: #Message
                 message_data['message'] = me_json['content']['body']
             
-            elif 'caption' in me_json['content']: #Message attached to media types (document, video, photo)
-                message_data['message'] = me_json['content']['caption']
+            elif 'mime_type' in me_json['content']: #Message attached to media types (document, video, photo)
+                message_data['message'] = me_json['content']['caption'] if 'caption' in me_json['content'] else None
                 message_data['media_id'] = me_json['content']['id']
                 message_data['mime_type'] = me_json['content']['mime_type']
             
