@@ -1,7 +1,7 @@
 from flask import Flask
 import os
 from settings import Settings, login_manager
-from database import db
+from database import db, DB_URI
 from config import configure_login_manager, configure_database, register_blueprints
 from flask_cors import CORS
 
@@ -20,7 +20,7 @@ configure_login_manager(login_manager, app)
 
 with app.app_context():
     register_blueprints(app)
-    configure_database(app, db)
+    configure_database(app, db, DB_URI)
 
 #Run the application
 if __name__ == '__main__':
