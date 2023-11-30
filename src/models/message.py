@@ -73,3 +73,7 @@ class Message(db.Model):
             'read' : MessageStatus.READ,
         }
         return statuses[message_status].value if message_status in statuses else MessageStatus.ERROR.value
+    
+    
+    def set_status(self, status : MessageStatus) : 
+        self.status = status.value

@@ -21,8 +21,6 @@ def create_logger() -> Logger:
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
     
-    
-    
     return logger
 
 

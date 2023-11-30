@@ -7,7 +7,7 @@ base_headers = {
     "Content-Type": "application/json"
 }
 
-base_graph_mesages_json = {
+base_graph_messages_json = {
     "messaging_product": "whatsapp",
     "recipient_type": "individual"
 }

@@ -4,7 +4,7 @@ from database import db
 from src.models import Chat, Message, MessageStatus
 from src.events import MessageEvents
 from datetime import datetime
-from src.utils.messages_utils import base_headers, graph_messages_url, base_graph_mesages_json
+from src.utils.messages_utils import base_headers, graph_messages_url, base_graph_messages_json
 
 class MessageService:
   
@@ -128,7 +128,7 @@ class MessageService:
         if message_json['type'] == 'text':
             ret_json = MessageService._prepare_text_message(message_json) 
         elif message_json['type'] == 'media':
-            ret_json = base_graph_mesages_json.copy() #TODO: Media messages
+            ret_json = base_graph_messages_json.copy() #TODO: Media messages
         
         #Phone number
         chat = Chat.query.get(message_json['chat_id'])
@@ -148,7 +148,7 @@ class MessageService:
         return True, response.json()['messages'][0]['id']
     
     def _prepare_text_message(message_json):
-        ret_json = base_graph_mesages_json.copy()
+        ret_json = base_graph_messages_json.copy()
         ret_json['type'] = 'text'
         ret_json['text'] = {
             "preview_url" : True,

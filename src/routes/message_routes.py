@@ -16,5 +16,6 @@ class SendMessageSchema(Schema):
 
 @message_routes.route('/send', methods=['POST'])
 def send_message():
+    #TODO:Terminar el schema
     response = MessageController.send_message(request.json)
     return make_response(response)
