@@ -6,6 +6,9 @@ from src.events import MessageEvents
 from datetime import datetime
 from src.utils.messages_utils import base_headers, graph_messages_url, base_graph_messages_json
 from settings import logger
+from typing import List
+from settings import MESSAGES_BY_REQUEST
+
 
 class MessageService:
   
@@ -29,7 +32,9 @@ class MessageService:
             db.session.commit()
         return chat
     
-    
+    def get_messages(chat : Chat, date: datetime) -> List[Message] | None:
+        messages = Message.query.filter_by(chat_id=chat.id).filter(Message.sent_at < date).order_by(Message.sent_at.desc()).limit(MESSAGES_BY_REQUEST).all()
+        return messages, len(messages) == MESSAGES_BY_REQUEST
 
     #This functions recieves the raw json from entring messages, and it returns a simplified object with all relevant mesasge data
     def get_message_data(message_json):

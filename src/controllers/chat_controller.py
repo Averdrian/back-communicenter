@@ -8,6 +8,7 @@ class ChatController:
     def chat_read(chat_id: int) -> (dict, int):
         try:
             chat : Chat = Chat.query.get(chat_id)
+            if not chat : return {'success': False, 'error': 'Chat not found'}, 404
             ChatService.set_messages_read(chat)
             
             return {'success': True}, 200

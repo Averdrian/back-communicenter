@@ -1,6 +1,8 @@
 from flask import Blueprint, request, make_response
 from marshmallow import Schema, fields, ValidationError
 from src.controllers import MessageController
+from datetime import datetime
+import pytz
 
 message_routes = Blueprint('message_routes', __name__)
 message_prefix = '/messages'
@@ -18,4 +20,11 @@ class SendMessageSchema(Schema):
 def send_message():
     #TODO:Terminar el schema
     response = MessageController.send_message(request.json)
+    return make_response(response)
+
+
+@message_routes.route('/<chat_id>', defaults={'timestamp' : datetime.now(pytz.timezone('Europe/Madrid')).timestamp()}, methods=['GET'])
+@message_routes.route('/<chat_id>/<float:timestamp>', methods=['GET'])
+def get_messages(chat_id, timestamp):
+    response = MessageController.get_messages(chat_id, timestamp)
     return make_response(response)

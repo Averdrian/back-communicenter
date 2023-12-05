@@ -77,3 +77,17 @@ class Message(db.Model):
     
     def set_status(self, status : MessageStatus) : 
         self.status = status.value
+
+    def as_dict(self) -> dict:
+        return {
+            'id': self.id,
+            'user_id' : self.user_id,
+            'type': MessageType(self.type).name,
+            'message': self.message,
+            'media_id':self.media_id,
+            'mime_type':self.mime_type,
+            'wamid':self.wamid,
+            'sent_at':self.sent_at.strftime("%d/%m/%Y %H:%M"),
+            'ref_wamid':self.wamid,
+            'status':MessageStatus(self.status).name
+        }
