@@ -17,3 +17,12 @@ class ChatController:
             logger.error(str(error))
             db.session.rollback()
             return {'success': False, 'error': str(error)}, 500
+        
+        
+    def get_chat(chat_id : int) -> (dict, int):
+        try:
+            chat = Chat.query.get_or_404(chat_id)
+            return {'success' : True, 'chat': chat.to_dict()}, 200
+        except Exception as _:
+            return {'success' : False, 'error': 'Chat not found'}, 404
+    

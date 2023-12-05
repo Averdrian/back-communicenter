@@ -1,7 +1,6 @@
 from database import db
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
-from src.models import Chat
 
 class MessageType(Enum):
     TEXT = 1
@@ -50,7 +49,7 @@ class Message(db.Model):
         self.status = message_data['status'] if 'status' in message_data else MessageStatus.PENDING.value
 
     @staticmethod
-    def get_message_type(message_type : str) -> MessageType :
+    def get_message_type(message_type : str) -> int :
         types = {
             'text': MessageType.TEXT,
             'image': MessageType.IMAGE,

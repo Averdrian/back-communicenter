@@ -1,5 +1,6 @@
 from database import db
 from phone_iso3166.country import phone_country
+from datetime import datetime
 
 #TODO: Enumerado para los status (MIRAR CONSTRUCTOR QUE USA 0 DE BASE)
 
@@ -20,3 +21,16 @@ class Chat(db.Model):
         self.whatsapp_name = whatsapp_name
         self.organization_id = organization_id
         self.country = phone_country(phone)
+
+
+    def to_dict(self):
+        return {
+            'id':self.id,
+            'phone':self.phone,
+            'whatsapp_name':self.whatsapp_name,
+            'organization_id':self.organization_id,
+            'status':self.status, #TODO: Esto cambiara y devolvera el nombre del status en su debido momento
+            'last_message_at': self.last_message_at.strftime("%d/%m/%Y %H:%M"),
+            'expires_at': self.expires_at.strftime("%d/%m/%Y %H:%M"),
+            'country' : self.country
+        }
