@@ -8,6 +8,7 @@ from src.utils.messages_utils import base_headers, graph_messages_url, base_grap
 from settings import logger
 from typing import List
 from settings import MESSAGES_BY_REQUEST
+from src.models import ChatStatus
 
 
 class MessageService:
@@ -18,7 +19,6 @@ class MessageService:
         message = Message(message_data)
         db.session.add(message)
         db.session.commit()
-        MessageEvents.inserted(message)
         
         return message
         

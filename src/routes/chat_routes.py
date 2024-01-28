@@ -12,8 +12,15 @@ def get_chat(chat_id : int):
     return make_response(response)
 
 
+
 @chat_routes.route('/<int:chat_id>/read', methods=['POST'])
 def send_message(chat_id : int):
     response = ChatController.chat_read(chat_id)
     return make_response(response)
 
+
+@chat_routes.route('/<int:chat_id>/status/<int:status>', methods=['PATCH'])
+def update_status(chat_id : int, status : int):
+    
+    response = ChatController.update_status(chat_id, status)
+    return make_response(response)

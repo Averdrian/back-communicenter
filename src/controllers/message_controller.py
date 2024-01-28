@@ -6,6 +6,7 @@ from datetime import datetime
 from flask import jsonify
 from settings import APPLICATION_TIMEZONE
 import pytz
+from src.events import MessageEvents
 
 class MessageController:
     
@@ -32,8 +33,9 @@ class MessageController:
             chat = MessageService.create_or_update_chat(message_data)
             message_data['chat_id'] = chat.id
 
-            MessageService.create_message(message_data)
-            
+            message = MessageService.create_message(message_data)
+            MessageEvents.inserted(message)
+
             return {'success': True}, 201
             
         except Exception as error:
@@ -66,7 +68,9 @@ class MessageController:
             if not success : return {'success': False, 'error': "Error sending message"}
             
             message_json['wamid'] = wamid
-            MessageService.create_message(message_json)
+            message = MessageService.create_message(message_json)
+            MessageEvents.inserted(message)
+
             
             return {'success': True}, 201
         except Exception as error:
