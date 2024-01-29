@@ -1,24 +1,17 @@
 from database import db
 from src.models.user import User
-from src.utils.hash_password import hash_password
+from src.services import UserService
 
 class UserController:
 
-    def create(user_data):
-
-        username = user_data['username']
-        email = user_data['email']
-        password = user_data['password']
+    def register(user_data):
 
         try:
             #Email already exists, throw error
-            if User.query.filter_by(email=email).first():
+            if User.query.filter_by(email=user_data['email']).first():
                 return {'message': 'Email already taken'}, 400
 
-            new_user = User(username=username, email=email, password=hash_password(password))
-
-            # Adds the user to the session and commits into database
-            db.session.add(new_user)
+            UserService.create_user(user_data)
             db.session.commit()
 
             return {'message': 'User created successfully'}, 201

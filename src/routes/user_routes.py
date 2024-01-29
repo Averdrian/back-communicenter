@@ -10,6 +10,7 @@ class SignUpSchema(Schema):
     username = fields.String(required=True)
     email = fields.String(required=True)
     password = fields.String(required=True)
+    organization_id = fields.Integer(required=True)
 
 
 @user_routes.route('/signup', methods=['POST'])
@@ -21,7 +22,7 @@ def sign_up():
     except ValidationError as error:
         return make_response(jsonify({'error': error.messages}), 400)
         
-    result = UserController.create(user_data)
+    result = UserController.register(user_data)
 
     return make_response(result)
 

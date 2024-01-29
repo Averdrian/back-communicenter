@@ -10,10 +10,11 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(72), unique=False, nullable=False)
     organization_id = db.Column(db.BigInteger, db.ForeignKey("organization.id", ondelete='CASCADE'))
 
-    def __init__(self, username, email, password):
+    def __init__(self, username, email, password, organization_id):
         self.username = username
         self.email = email
         self.password = password
+        self.organization_id = organization_id
 
     def get_id(self):
         return str(self.id)

@@ -7,24 +7,21 @@ class AuthController:
 
     def login(login_data):
 
-        email : str = login_data['email']
-        password = login_data['password']
-
         try:
-            user : User = User.query.filter_by(email=email).first()
+            user : User = User.query.filter_by(email=login_data['email']).first()
 
-            if user and check_password(password, user.password):
+            if user and check_password(login_data['password'], user.password):
                 login_user(user)
                 token = generate_access_token(user.id)
 
                 return jsonify({'access_token': token}), 200
             
-            else: return 'Authentication error', 401
+            else: return {'success' : False, 'error': 'Authentication error'}, 401
 
         except Exception as e:
-            return {'error': 'Failed to login' + str(e)}, 500
+            return {'success': False, 'error': 'Failed to login' + str(e)}, 500
         
 
     def logout():
         logout_user()
-        return 'success', 200
+        return {'success': True}, 200
