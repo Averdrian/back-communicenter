@@ -18,8 +18,13 @@ class SendMessageSchema(Schema):
 
 @message_routes.route('/send', methods=['POST'])
 def send_message():
-    #TODO:Terminar el schema
-    response = MessageController.send_message(request.json)
+    try:
+        send_message_schema = SendMessageSchema()
+        message_data = send_message_schema.load(request.json)
+        
+    except ValidationError as error:
+        return make_response(({'error': error.messages}, 400))
+    response = MessageController.send_message(message_data)
     return make_response(response)
 
 

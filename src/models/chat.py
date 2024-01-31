@@ -24,6 +24,7 @@ class Chat(db.Model):
     expires_at = db.Column(db.DateTime, unique=False, nullable=True)
     country = db.Column(db.String(5), unique=False, nullable=True)
     messages = db.relationship('Message', backref='chat', cascade='all, delete-orphan')
+
     
     def __init__(self, phone, status = ChatStatus.UNINITIATED, whatsapp_name = None, organization_id = None):
         self.phone = phone
@@ -33,17 +34,19 @@ class Chat(db.Model):
         self.country = phone_country(phone)
 
 
+    def set_status(self, status : ChatStatus):
+        self.status = status.value
+
+
     def to_dict(self):
         return {
             'id':self.id,
             'phone':self.phone,
             'whatsapp_name':self.whatsapp_name,
             'organization_id':self.organization_id,
-            'status':self.status, #TODO: Esto cambiara y devolvera el nombre del status en su debido momento
+            'status':self.status,
+            'status_name' : ChatStatus(self.status).name,
             'last_message_at': self.last_message_at.strftime("%d/%m/%Y %H:%M"),
             'expires_at': self.expires_at.strftime("%d/%m/%Y %H:%M"),
             'country' : self.country
         }
-        
-    
-    #TODO: LA LOGICA PARA LOS STATUS COMO ENUM (CONSULTAR MESSAGES Y SUS ENUMERADOS)
