@@ -2,7 +2,7 @@ from flask import Flask
 import os
 from settings import Settings, login_manager
 from database import db, DB_URI
-from config import configure_login_manager, configure_database, register_blueprints
+from config import configure_database, register_blueprints
 from flask_cors import CORS
 
 
@@ -16,7 +16,7 @@ CORS(app, origins=os.getenv("FRONT_URL"))
 app.config.from_object(Settings)
 
 #Authentication, login manager
-configure_login_manager(login_manager, app)
+login_manager.init_app(app)
 
 with app.app_context():
     register_blueprints(app)
