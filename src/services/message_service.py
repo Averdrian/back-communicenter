@@ -126,8 +126,8 @@ class MessageService:
             db.session.add(message)
             db.session.commit()
             
-    def can_send(message_json):
-        chat = Chat.query.get(message_json['chat_id'])
+    def can_send(chat_id):
+        chat = Chat.query.get(chat_id)
         return chat.expires_at and datetime.now() < chat.expires_at
     
     def prepare_message_body(message_json):
@@ -149,9 +149,8 @@ class MessageService:
     
     def send_message(send_json):
         response = requests.post(url=graph_messages_url, json=send_json, headers=base_headers)
-        if 'error' in response.json() : return False, None
-        
-        return True, response.json()['messages'][0]['id']
+        if 'error' in response.json() : raise Exception(response.json()['error']['message'])        
+        return response.json()['messages'][0]['id']
     
     def _prepare_text_message(message_json):
         ret_json = base_graph_messages_json.copy()

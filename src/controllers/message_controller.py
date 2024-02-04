@@ -1,7 +1,7 @@
 from src.services import MessageService
 from database import db
 from settings import logger
-from src.models import Chat, Message
+from src.models import Chat
 from datetime import datetime
 from flask import jsonify
 from settings import APPLICATION_TIMEZONE
@@ -60,12 +60,10 @@ class MessageController:
     def send_message(message_json):
         
         try:
-            if not MessageService.can_send(message_json) : return {'success' : False, 'error': 'The chat is expired'}, 403
+            if not MessageService.can_send(message_json['chat_id']) : return {'success' : False, 'error': 'The chat is expired'}, 403
             
             send_json = MessageService.prepare_message_body(message_json)
-            success, wamid = MessageService.send_message(send_json)
-            
-            if not success : return {'success': False, 'error': "Error sending message"}
+            wamid = MessageService.send_message(send_json)
             
             message_json['wamid'] = wamid
             message = MessageService.create_message(message_json)
@@ -73,7 +71,7 @@ class MessageController:
 
             
             return {'success': True}, 201
-        except Exception as error:
+        except BaseException as error:
             logger.error(str(error))
             db.session.rollback()
-            return {'success': False, 'error': str(error)}, 500
+            return {'success': False, 'error': str(error)}, 400
