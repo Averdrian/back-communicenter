@@ -1,5 +1,7 @@
 from marshmallow import Schema, fields, ValidationError
 from flask import Blueprint, request, jsonify, make_response
+from flask_login import login_required
+
 
 from src.controllers import UserController
 
@@ -12,7 +14,7 @@ class SignUpSchema(Schema):
     password = fields.String(required=True)
     organization_id = fields.Integer(required=True)
 
-
+@login_required
 @user_routes.route('/signup', methods=['POST'])
 def sign_up():
     try:
@@ -26,3 +28,10 @@ def sign_up():
 
     return make_response(result)
 
+
+@login_required
+@user_routes.route('/users', methods=['GET'])
+def get_users():
+    
+    result = UserController.get_users(request.args)
+    return make_response(result)    

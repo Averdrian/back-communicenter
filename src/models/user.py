@@ -1,7 +1,11 @@
 from database import db
 from settings import login_manager
 from flask_login import UserMixin
+from enum import Enum
 
+class UserRole(Enum):
+    CHIEF = 0
+    EMPLOYEE = 1
 
 class User(UserMixin, db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
@@ -9,12 +13,14 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(72), unique=False, nullable=False)
     organization_id = db.Column(db.BigInteger, db.ForeignKey("organization.id", ondelete='CASCADE'))
+    role = db.Column(db.SmallInteger, nullable=False, default=UserRole.EMPLOYEE.value)
 
-    def __init__(self, username, email, password, organization_id):
+    def __init__(self, username, email, password, organization_id, role = UserRole.EMPLOYEE.value):
         self.username = username
         self.email = email
         self.password = password
         self.organization_id = organization_id
+        self.role = role
 
     def get_id(self):
         return str(self.id)
@@ -22,3 +28,13 @@ class User(UserMixin, db.Model):
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.filter_by(id=user_id).first()
+    
+    
+    def to_dict(self):
+        return {
+            'id' : self.id,
+            'username' : self.username,
+            'email' : self.email,
+            'organization_id' : self.organization_id,
+            'role' : self.role
+        }
