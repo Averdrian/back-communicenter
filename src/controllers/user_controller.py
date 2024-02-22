@@ -22,15 +22,9 @@ class UserController:
             return {'error': 'Failed to create user: ' + str(e)}, 500
         
         
-    #TODO: solo se muestren los usuarios de todas las companies si es de la organizacion de administracion (ahora estara como organization_id = 1)
     def get_users(query_args):
-        
-        user = User.query
-        if current_user.organization_id != 1: user = user.filter_by(organization_id=current_user.organization_id)
-        
-        for clave, valor in query_args.items():
-            try: user = user.filter(getattr(User,clave)==valor)
-            except Exception as _: continue #Si un filtro del query string no tiene sentido lo ignoramos
-        users = user.all()
-            
-        return {'users': [us.to_dict() for us in users]}, 200
+        try:
+            list_users = UserService.get_users(query_args.items())
+            return {'users': [us.to_dict() for us in list_users]}, 200
+        except Exception as e:
+            return {'error': 'Failed to get the users: ' + str(e)}, 500
