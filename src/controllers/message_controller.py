@@ -1,4 +1,4 @@
-from src.services import MessageService
+from src.services import MessageService, ChatService
 from database import db
 from settings import logger
 from src.models import Chat
@@ -30,7 +30,7 @@ class MessageController:
     def receive_message(message_json):
         try:
             message_data = MessageService.get_message_data(message_json)
-            chat = MessageService.create_or_update_chat(message_data)
+            chat = ChatService.get_or_create({'phone':message_data['phone_number'], 'whatsapp_name': message_data['name']})
             message_data['chat_id'] = chat.id
 
             message = MessageService.create_message(message_data)

@@ -10,7 +10,6 @@ from typing import List
 from settings import MESSAGES_BY_REQUEST
 from src.models import ChatStatus
 
-
 class MessageService:
   
     
@@ -20,17 +19,7 @@ class MessageService:
         db.session.add(message)
         db.session.commit()
         
-        return message
-        
-    def create_or_update_chat(message_data):
-        chat = Chat.query.filter(Chat.phone == message_data['phone_number']).first()
-    
-        #If chat does not exist we create it
-        if not chat:
-            chat = Chat(phone=message_data['phone_number'], whatsapp_name=message_data['name'])
-            db.session.add(chat)
-            db.session.commit()
-        return chat
+        return message 
     
     def get_messages(chat : Chat, date: datetime) -> List[Message] | None:
         messages = Message.query.filter_by(chat_id=chat.id).filter(Message.sent_at < date).order_by(Message.sent_at.desc()).limit(MESSAGES_BY_REQUEST).all()
