@@ -3,6 +3,8 @@ from marshmallow import Schema, fields, ValidationError
 from src.controllers import MessageController
 from datetime import datetime
 import pytz
+from werkzeug.exceptions import BadRequest
+
 
 message_routes = Blueprint('message_routes', __name__)
 message_prefix = '/messages'
@@ -24,6 +26,11 @@ def send_message():
         
     except ValidationError as error:
         return make_response(({'error': error.messages}, 400))
+    
+    except BadRequest as error:
+        return make_response(({'error': error.description}, 400))
+    
+    
     response = MessageController.send_message(message_data)
     return make_response(response)
 

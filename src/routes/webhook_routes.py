@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, make_response
 from marshmallow import Schema, fields, ValidationError
 from src.controllers import WebhookController, MessageController
+from werkzeug.exceptions import BadRequest
 
 webhook_routes = Blueprint('webhook_routes', __name__)
 
@@ -16,7 +17,11 @@ def verify_token():
         verify_token_schema = VerifyTokenSchema()
         verify_data = verify_token_schema.load(request.args)
     except ValidationError as error:
-        return jsonify({'error': error.messages}), 400
+        return make_response(({'error': error.messages}), 400)
+    
+    except BadRequest as error:
+        return make_response(({'error': error.description}, 400))
+    
     
     response = make_response(WebhookController.verify(verify_data))
 

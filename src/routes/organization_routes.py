@@ -24,6 +24,9 @@ def send_message():
         create_organization_schema = CreateOrganizationSchema()
         organization_data = create_organization_schema.load(request.json)
         
+    except ValidationError as error:
+        return make_response(({'error': error.messages}), 400)
+    
     except BadRequest as error:
         return make_response(({'error': error.description}, 400))
     

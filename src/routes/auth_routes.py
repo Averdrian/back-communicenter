@@ -1,7 +1,8 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import Blueprint, request, make_response
 from flask_login import login_required
 from marshmallow import Schema, fields, ValidationError
 from src.controllers.auth_controller import AuthController
+from werkzeug.exceptions import BadRequest
 
 auth_routes = Blueprint('auth_routes', __name__)
 
@@ -17,7 +18,11 @@ def login():
         login_data = login_schema.load(request.json)
 
     except ValidationError as error:
-        return jsonify({'error': error.messages}), 400
+        return make_response(({'error': error.messages}), 400)
+    
+    except BadRequest as error:
+        return make_response(({'error': error.description}, 400))
+    
     
     result = AuthController.login(login_data)
 
