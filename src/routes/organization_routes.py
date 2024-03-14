@@ -19,7 +19,7 @@ class CreateOrganizationSchema(Schema):
     
 
 @organization_routes.route('/create', methods=['POST'])
-def send_message():
+def create():
     try:
         create_organization_schema = CreateOrganizationSchema()
         organization_data = create_organization_schema.load(request.json)
@@ -31,4 +31,11 @@ def send_message():
         return make_response(({'error': error.description}, 400))
     
     response = OrganizationController.create(organization_data)
+    return make_response(response)
+
+
+#TODO:  SOLO ADMINS
+@organization_routes.route('/all', methods=['GET'])
+def get_all():
+    response = OrganizationController.get_all()
     return make_response(response)

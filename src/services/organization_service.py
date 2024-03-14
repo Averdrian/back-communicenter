@@ -8,3 +8,8 @@ class OrganizationService:
         organization = Organization(org_data)
         db.session.add(organization)
         return organization
+    
+    
+    def get_all() -> list[Organization]:
+        organizations = Organization.query.all()
+        return organizations

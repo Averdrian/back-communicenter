@@ -17,3 +17,14 @@ class Organization(db.Model):
         self.wb_account_id = organization_data['wb_account_id']
         self.wa_verify_token = organization_data['wa_verify_token'] if 'wa_verify_token' in organization_data else None
         self.wa_api_key = organization_data['wa_api_key'] if 'wa_api_key' in organization_data else None
+        
+        
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'wa_phone_id': self.wa_phone_id,
+            'wb_account_id': self.wb_account_id,
+            'wa_api_key': self.wa_api_key,
+            'wa_verify_token': self.wa_verify_token
+        }
