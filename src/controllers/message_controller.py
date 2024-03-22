@@ -60,7 +60,7 @@ class MessageController:
     def send_message(message_json):
         
         try:
-            if not MessageService.can_send(message_json['chat_id']) : return {'success' : False, 'error': 'The chat is expired'}, 403
+            # if not MessageService.can_send(message_json['chat_id']) : return {'success' : False, 'error': 'The chat is expired'}, 403
             
             send_json = MessageService.prepare_message_body(message_json)
             wamid = MessageService.send_message(send_json)

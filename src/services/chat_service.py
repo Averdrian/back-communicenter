@@ -11,7 +11,7 @@ class ChatService:
         chat = Chat.query.filter(Chat.phone == chat_data['phone']).first()
     
         #If chat does not exist we create it
-        if not chat:  
+        if not chat:    
             chat = Chat(phone=chat_data['phone'], whatsapp_name=chat_data['whatsapp_name'])
             db.session.add(chat)
             db.session.commit()
@@ -21,6 +21,7 @@ class ChatService:
     def set_messages_read(chat : Chat) -> None:
         
         #We will set all messages that are not already read 
+        
         messages = [message for message in chat.messages \
                         if message.user_id is None and message.status is not MessageStatus.READ.value]
         
@@ -31,7 +32,7 @@ class ChatService:
         
         for message in messages:
             json['message_id'] = message.wamid
-            requests.post(url=graph_messages_url, json=json, headers=base_headers) #Call graph api to set messages to read
+            requests.post(url=graph_messages_url(), json=json, headers=base_headers()) #Call graph api to set messages to read
             message.status = MessageStatus.READ.value #We also set the messages to read
         
         

@@ -1,13 +1,19 @@
 import os
+from flask_login import current_user, login_required
 
-graph_messages_url = "https://graph.facebook.com/{version}/{phone_id}/messages".format(version=os.getenv('WA_API_VERSION'), phone_id=os.getenv('WA_PHONE_ID'))
+@login_required
+def graph_messages_url() -> str:
+    return "https://graph.facebook.com/{version}/{phone_id}/messages".format(version=os.getenv('WA_API_VERSION'), phone_id=current_user.organization.wa_phone_id)
 
-base_headers = {
-    "Authorization": "Bearer {token}".format(token=os.getenv('WA_API_KEY')),
-    "Content-Type": "application/json"
-}
+@login_required
+def base_headers() -> dict:
+    return {
+        "Authorization": "Bearer {token}".format(token=current_user.organization.wa_api_key),
+        "Content-Type": "application/json"
+    }
 
-base_graph_messages_json = {
-    "messaging_product": "whatsapp",
-    "recipient_type": "individual"
-}
+def base_graph_messages_json() -> dict:
+    return {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual"
+    }

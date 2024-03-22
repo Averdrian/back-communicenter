@@ -9,6 +9,7 @@ from settings import logger
 from typing import List
 from settings import MESSAGES_BY_REQUEST
 from src.models import ChatStatus
+from flask_login import login_required, current_user
 
 class MessageService:
   
@@ -123,7 +124,7 @@ class MessageService:
         if message_json['type'] == 'text':
             ret_json = MessageService._prepare_text_message(message_json) 
         elif message_json['type'] == 'media':
-            ret_json = base_graph_messages_json.copy() #TODO: Media messages
+            ret_json = base_graph_messages_json() #TODO: Media messages
         
         #Phone number
         chat = Chat.query.get(message_json['chat_id'])
@@ -135,14 +136,15 @@ class MessageService:
             if wamid: ret_json['context'] = {'message_id':wamid}
         return ret_json
     
-    
+    @login_required
     def send_message(send_json):
-        response = requests.post(url=graph_messages_url, json=send_json, headers=base_headers)
+        
+        response = requests.post(url=graph_messages_url(), json=send_json, headers=base_headers())
         if 'error' in response.json() : raise Exception(response.json()['error']['message'])        
         return response.json()['messages'][0]['id']
     
     def _prepare_text_message(message_json):
-        ret_json = base_graph_messages_json.copy()
+        ret_json = base_graph_messages_json()
         ret_json['type'] = 'text'
         ret_json['text'] = {
             "preview_url" : True,

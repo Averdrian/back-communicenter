@@ -1,6 +1,5 @@
 from database import db
 from phone_iso3166.country import phone_country
-from datetime import datetime
 from enum import Enum
 
 class ChatStatus(Enum):

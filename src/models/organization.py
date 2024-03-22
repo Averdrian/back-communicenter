@@ -6,9 +6,9 @@ class Organization(db.Model):
     name = db.Column(db.String(80), unique=True, nullable=False)
     wa_phone_id = db.Column(db.BigInteger, unique=True, nullable=False)
     wb_account_id = db.Column(db.BigInteger, unique=True, nullable=False)
-    wa_api_key = db.Column(db.String(130), nullable=True)
+    wa_api_key = db.Column(db.String(300), nullable=True)
     wa_verify_token = db.Column(db.String(50), nullable=True)
-    users = db.relationship('User', backref='users', lazy='joined')
+    users = db.relationship('User', back_populates='organization', lazy='joined')
     chats = db.relationship('Chat', backref='organization', lazy='joined')
 
     def __init__(self, organization_data):

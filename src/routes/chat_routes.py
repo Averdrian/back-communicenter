@@ -14,7 +14,7 @@ def get_chat(chat_id : int):
 
 
 @chat_routes.route('/<int:chat_id>/read', methods=['POST'])
-def send_message(chat_id : int):
+def read_messages(chat_id : int):
     response = ChatController.chat_read(chat_id)
     return make_response(response)
 

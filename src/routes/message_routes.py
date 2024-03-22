@@ -15,7 +15,6 @@ class SendMessageSchema(Schema):
     message = fields.String(required=False)
     preview_url = fields.Bool(required=False)
     media_id = fields.Integer(required=False)
-    user_id = fields.Integer(required=False) #TODO: EN UN FUTURO ESTO NO SE VA A HACER, CUANDO AÑADAMOS LOS AUTH
     
 
 @message_routes.route('/send', methods=['POST'])

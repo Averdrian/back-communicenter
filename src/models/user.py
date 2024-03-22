@@ -14,6 +14,8 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(72), unique=False, nullable=False)
     organization_id = db.Column(db.BigInteger, db.ForeignKey("organization.id", ondelete='CASCADE'))
     role = db.Column(db.SmallInteger, nullable=False, default=UserRole.EMPLOYEE.value)
+    organization = db.relationship('Organization', back_populates='users', lazy='joined')
+
 
     def __init__(self, username, email, password, organization_id, role = UserRole.EMPLOYEE.value):
         self.username = username
