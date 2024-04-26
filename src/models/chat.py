@@ -25,7 +25,7 @@ class Chat(db.Model):
     expires_at = db.Column(db.DateTime, unique=False, nullable=True)
     country = db.Column(db.String(5), unique=False, nullable=True)
     messages = db.relationship('Message', backref='chat', cascade='all, delete-orphan')
-
+    notes = db.relationship('ChatNote', backref='chat', cascade='all, delete-orphan')
     
     def __init__(self, phone, status = ChatStatus.UNINITIATED, whatsapp_name = None, organization_id = None):
         self.phone = phone
