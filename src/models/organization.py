@@ -2,6 +2,8 @@ from database import db
 
 
 class Organization(db.Model):
+    __tablename__ = "organizations"
+    
     id = db.Column(db.BigInteger, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     wa_phone_id = db.Column(db.BigInteger, unique=True, nullable=False)
@@ -10,6 +12,7 @@ class Organization(db.Model):
     wa_verify_token = db.Column(db.String(50), nullable=True)
     users = db.relationship('User', back_populates='organization', lazy='joined')
     chats = db.relationship('Chat', backref='organization', lazy='joined')
+    templates = db.relationship('Template', backref='organization', lazy='joined')
 
     def __init__(self, organization_data):
         self.name = organization_data['name']

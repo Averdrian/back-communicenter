@@ -8,11 +8,13 @@ class UserRole(Enum):
     EMPLOYEE = 1
 
 class User(UserMixin, db.Model):
+    __tablename__ = "users"
+    
     id = db.Column(db.BigInteger, primary_key=True)
     username = db.Column(db.String(80), unique=False, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(72), unique=False, nullable=False)
-    organization_id = db.Column(db.BigInteger, db.ForeignKey("organization.id", ondelete='CASCADE'))
+    organization_id = db.Column(db.BigInteger, db.ForeignKey("organizations.id", ondelete='CASCADE'))
     role = db.Column(db.SmallInteger, nullable=False, default=UserRole.EMPLOYEE.value)
     organization = db.relationship('Organization', back_populates='users', lazy='joined')
 

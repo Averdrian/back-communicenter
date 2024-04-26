@@ -14,10 +14,12 @@ class ChatStatus(Enum):
 
 
 class Chat(db.Model):
+    __tablename__ = "chats"
+    
     id = db.Column(db.BigInteger, primary_key=True)
     phone = db.Column(db.BigInteger, unique=True, nullable=False)
     whatsapp_name = db.Column(db.String(60), unique=False, nullable=True)
-    organization_id = db.Column(db.BigInteger, db.ForeignKey('organization.id'), nullable=True)
+    organization_id = db.Column(db.BigInteger, db.ForeignKey('organizations.id'), nullable=True)
     status = db.Column(db.SmallInteger, unique=False, nullable=False)
     last_message_at = db.Column(db.DateTime, unique=False, nullable=True)
     expires_at = db.Column(db.DateTime, unique=False, nullable=True)

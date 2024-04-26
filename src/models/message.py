@@ -23,17 +23,19 @@ class MessageStatus(Enum):
     
 
 class Message(db.Model):
+    __tablename__ = "messages"
+    
 
     id = db.Column(db.BigInteger, primary_key=True)
-    chat_id = db.Column(db.BigInteger, db.ForeignKey('chat.id', ondelete='CASCADE'), nullable=False)
-    user_id = db.Column(db.BigInteger, db.ForeignKey("user.id"), nullable=True)
+    chat_id = db.Column(db.BigInteger, db.ForeignKey('chats.id', ondelete='CASCADE'), nullable=False)
+    user_id = db.Column(db.BigInteger, db.ForeignKey("users.id"), nullable=True)
     type = db.Column(db.SmallInteger, nullable=False)
     message = db.Column(db.Text, nullable=True)
     media_id = db.Column(db.BigInteger, nullable=True)
     status = db.Column(db.SmallInteger, nullable=False, default=MessageStatus.PENDING.value)
     mime_type = db.Column(db.String(20), nullable=True)
     wamid = db.Column(db.String(100), nullable=True, unique=True)
-    ref_wamid=db.Column(db.String(100), db.ForeignKey("message.wamid"), nullable=True, unique=False)
+    ref_wamid=db.Column(db.String(100), db.ForeignKey("messages.wamid"), nullable=True, unique=False)
     sent_at = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, message_data) :
