@@ -3,3 +3,4 @@ from .chat_service import ChatService
 from .user_service import UserService
 from .organization_service import OrganizationService
 from .template_service import TemplateService
+from .chat_note_service import ChatNoteService
