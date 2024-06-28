@@ -43,6 +43,6 @@ class ChatService:
         
         
     #This method does not commit the db session, usually this will be part of other commits
-    def update_chat_status(chat : Chat, status) -> None:
+    def update_chat_status(chat : Chat, status) -> None: 
         chat.status = status
         db.session.add(chat)

@@ -14,7 +14,7 @@ class AuthController:
                 login_user(user, remember=False) #TODO:en un futuro deberemos parametrizar remember
                 token = generate_access_token(user.id)
 
-                return jsonify({'access_token': token}), 200
+                return jsonify({'user': user.to_dict(), 'access_token': token}), 200
             
             else: return {'success' : False, 'error': 'Authentication error'}, 401
 

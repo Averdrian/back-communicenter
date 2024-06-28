@@ -4,6 +4,10 @@ from settings import Settings, login_manager
 from database import db, DB_URI
 from config import configure_database, register_blueprints
 from flask_cors import CORS
+from dotenv import load_dotenv
+
+# Load enviroment variables
+load_dotenv()
 
 
 #Create the flask instance
@@ -11,6 +15,7 @@ app = Flask(__name__)
 
 #Add the URL from the frontend to the cors policy
 CORS(app, origins=os.getenv("FRONT_URL"))
+# CORS(app)
 
 #Gets our Config object into the instance configuration
 app.config.from_object(Settings)

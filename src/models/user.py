@@ -40,5 +40,6 @@ class User(UserMixin, db.Model):
             'username' : self.username,
             'email' : self.email,
             'organization_id' : self.organization_id,
+            'organization': self.organization.name,
             'role' : self.role
         }
