@@ -3,8 +3,14 @@ from database import db
 from src.utils.messages_utils import base_headers, graph_messages_url
 import requests
 from settings import logger
-
+from flask_login import current_user
+from typing import List
 class ChatService:
+    
+    
+    def get_all_chats() -> List[Chat] :
+        chats = Chat.query.filter(Chat.organization_id == current_user.organization_id)
+        return chats
     
     def get_or_create(chat_data : object) -> Chat:
                 

@@ -14,7 +14,7 @@ load_dotenv()
 app = Flask(__name__)
 
 #Add the URL from the frontend to the cors policy
-CORS(app, origins=os.getenv("FRONT_URL"))
+CORS(app, supports_credentials=True, origins=os.getenv("FRONT_URL"))
 # CORS(app)
 
 #Gets our Config object into the instance configuration

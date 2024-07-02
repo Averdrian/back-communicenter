@@ -5,6 +5,14 @@ from src.services import ChatService
 
 class ChatController:
     
+    def get_all_chats():
+        try:
+            chats = ChatService.get_all_chats()
+            return {'success' : True, 'chats': [chat.to_dict() for chat in chats] }, 200
+        except Exception as error:
+            logger.error(str(error))
+            return {'success': False, 'error' : 'Could not get chats'}, 500
+    
     def chat_read(chat_id):
         try:
             chat : Chat = Chat.query.get(chat_id)
