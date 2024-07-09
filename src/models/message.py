@@ -1,6 +1,7 @@
 from database import db
 from datetime import datetime
 from enum import Enum
+from settings import logger
 
 class MessageType(Enum):
     TEXT = 1
@@ -37,6 +38,7 @@ class Message(db.Model):
     wamid = db.Column(db.String(100), nullable=True, unique=True)
     ref_wamid=db.Column(db.String(100), db.ForeignKey("messages.wamid"), nullable=True, unique=False)
     sent_at = db.Column(db.DateTime, nullable=False)
+    user=db.relationship('User')
 
     def __init__(self, message_data) :
         self.chat_id = message_data['chat_id']
@@ -83,12 +85,13 @@ class Message(db.Model):
         return {
             'id': self.id,
             'user_id' : self.user_id,
+            'user_name' : self.user.username if self.user is not None else None,
             'type': MessageType(self.type).name,
             'message': self.message,
             'media_id':self.media_id,
             'mime_type':self.mime_type,
             'wamid':self.wamid,
-            'sent_at':self.sent_at.strftime("%d/%m/%Y %H:%M"),
-            'ref_wamid':self.wamid,
+            'sent_at':self.sent_at.strftime("%H:%M %d/%m/%Y"),
+            'ref_wamid':self.ref_wamid,
             'status':MessageStatus(self.status).name
         }
