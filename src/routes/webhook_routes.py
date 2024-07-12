@@ -3,6 +3,7 @@ from marshmallow import Schema, fields, ValidationError
 from src.controllers import WebhookController, MessageController
 from werkzeug.exceptions import BadRequest
 
+
 webhook_routes = Blueprint('webhook_routes', __name__)
 
 

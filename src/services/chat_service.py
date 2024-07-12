@@ -9,7 +9,7 @@ class ChatService:
     
     
     def get_all_chats() -> List[Chat] :
-        chats = Chat.query.filter(Chat.organization_id == current_user.organization_id)
+        chats = Chat.query.filter(Chat.organization_id == current_user.organization_id).order_by(Chat.last_message_at.desc())
         return chats
     
     def get_or_create(chat_data : object) -> Chat:

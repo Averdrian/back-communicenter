@@ -84,6 +84,7 @@ class Message(db.Model):
     def as_dict(self) -> dict:
         return {
             'id': self.id,
+            'chat_id': self.chat_id,
             'user_id' : self.user_id,
             'user_name' : self.user.username if self.user is not None else None,
             'type': MessageType(self.type).name,

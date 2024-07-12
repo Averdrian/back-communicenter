@@ -7,6 +7,8 @@ from flask import jsonify
 from settings import APPLICATION_TIMEZONE
 import pytz
 from src.events import MessageEvents
+from flask_login import current_user
+from socketio_instance import socketio
 
 class MessageController:
     
@@ -35,7 +37,10 @@ class MessageController:
 
             message = MessageService.create_message(message_data)
             MessageEvents.inserted(message)
-
+            
+            
+            socketio.emit('receive-message-'+str(message.chat_id), message.as_dict())
+                            
             return {'success': True}, 201
             
         except Exception as error:
@@ -66,11 +71,14 @@ class MessageController:
             wamid = MessageService.send_message(send_json)
             
             message_json['wamid'] = wamid
+            message_json['user_id'] = current_user.id
             message = MessageService.create_message(message_json)
             MessageEvents.inserted(message)
+            
+            
 
             
-            return {'success': True}, 201
+            return {'success': True, 'message': message.as_dict()}, 201
         except BaseException as error:
             logger.error(str(error))
             db.session.rollback()
