@@ -7,6 +7,7 @@ class ChatController:
     
     def get_chats():
         try:
+            ChatService.set_chats_closed()
             chats = ChatService.get_chats()
             return {'success' : True, 'chats': [chat.to_dict() for chat in chats] }, 200
         except Exception as error:

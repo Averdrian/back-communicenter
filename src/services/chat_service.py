@@ -1,4 +1,4 @@
-from src.models import Chat, Message, MessageStatus, Organization
+from src.models import Chat, ChatStatus, Message, MessageStatus, Organization
 from database import db
 from src.utils.messages_utils import base_headers, graph_messages_url
 import requests
@@ -6,12 +6,15 @@ from settings import logger
 from flask_login import current_user
 from typing import List
 from settings import PAGE_SIZE
+from datetime import datetime
 class ChatService:
     
     
     def get_chats() -> List[Chat] :
-        chats = Chat.query.filter(Chat.organization_id == current_user.organization_id).order_by(Chat.last_message_at.desc())
-        # chats = chats_query.paginate(page=page, per_page=PAGE_SIZE, error_out=False)
+        chats = Chat.query.filter(
+            Chat.organization_id == current_user.organization_id,
+            Chat.status.notin_([ChatStatus.UNINITIATED.value, ChatStatus.CLOSED.value, ChatStatus.RESOLVED.value])
+        ).order_by(Chat.last_message_at.desc())
         return chats
     
     def get_or_create(chat_data : object) -> Chat:
@@ -58,3 +61,14 @@ class ChatService:
     def update_chat_status(chat : Chat, status) -> None: 
         chat.status = status
         db.session.add(chat)
+        
+    
+    def set_chats_closed():
+
+        Chat.query.filter(
+            Chat.status.in_([ChatStatus.ANSWERED.value, ChatStatus.PENDING.value, ChatStatus.FIRST_PENDING.value]),
+            Chat.expires_at < datetime.now(),
+            Chat.organization_id==current_user.organization_id
+        ).update({'status' : ChatStatus.CLOSED.value})
+        
+        db.session.commit()
