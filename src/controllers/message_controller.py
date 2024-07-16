@@ -9,6 +9,7 @@ import pytz
 from src.events import MessageEvents
 from flask_login import current_user
 from socketio_instance import socketio
+from src.models import ChatStatus
 
 class MessageController:
     
@@ -32,14 +33,17 @@ class MessageController:
     def receive_message(message_json):
         try:
             message_data = MessageService.get_message_data(message_json)
-            chat = ChatService.get_or_create({'phone':message_data['phone_number'], 'whatsapp_name': message_data['name']})
+            chat = ChatService.get_or_create({'phone':message_data['phone_number'], 'whatsapp_name': message_data['name'], 'organization_phone_id': message_data['organization_phone_id']})
             message_data['chat_id'] = chat.id
 
             message = MessageService.create_message(message_data)
             MessageEvents.inserted(message)
             
             
-            socketio.emit('receive-message-'+str(message.chat_id), message.as_dict())
+            mess = message.as_dict()
+            mess['new_chat_status'] = message.chat.status
+            mess['new_chat_status_name'] = ChatStatus(message.chat.status).name
+            socketio.emit('receive-message-'+str(message.chat.organization_id), mess)
                             
             return {'success': True}, 201
             
@@ -75,10 +79,12 @@ class MessageController:
             message = MessageService.create_message(message_json)
             MessageEvents.inserted(message)
             
-            
+            ret = message.as_dict()
+            ret['new_chat_status'] = message.chat.status
+            ret['new_chat_status_name'] = ChatStatus(message.chat.status).name
 
             
-            return {'success': True, 'message': message.as_dict()}, 201
+            return {'success': True, 'message': ret}, 201
         except BaseException as error:
             logger.error(str(error))
             db.session.rollback()

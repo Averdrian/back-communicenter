@@ -17,7 +17,7 @@ class MessageEvents:
         
     def _new_chat_status(message : Message, chat : Chat) -> ChatStatus:
         if message.user_id : status = ChatStatus.ANSWERED
-        else : status = ChatStatus.FIRST_PENDING if len(chat.messages) == 1 else ChatStatus.PENDING #If messages has not user_id, its coming from customer, and if is the first message we put first pending, if not is just pending
+        else : status = ChatStatus.FIRST_PENDING if len(chat.messages) == 1 or chat.status == ChatStatus.FIRST_PENDING == 1 else ChatStatus.PENDING #If messages has not user_id, its coming from customer, and if is the first message we put first pending, if not is just pending
         return status
             
             

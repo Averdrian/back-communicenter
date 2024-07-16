@@ -7,8 +7,9 @@ chat_prefix = '/chat'
 
 
 @chat_routes.route('',  methods=['GET'])
-def all_chats() : 
-    response = ChatController.get_all_chats()
+def get_chats() :
+        
+    response = ChatController.get_chats()
     return make_response(response)
 
 @chat_routes.route('/<int:chat_id>', methods=['GET'])

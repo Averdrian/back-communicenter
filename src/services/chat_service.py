@@ -1,15 +1,17 @@
-from src.models import Chat, Message, MessageStatus
+from src.models import Chat, Message, MessageStatus, Organization
 from database import db
 from src.utils.messages_utils import base_headers, graph_messages_url
 import requests
 from settings import logger
 from flask_login import current_user
 from typing import List
+from settings import PAGE_SIZE
 class ChatService:
     
     
-    def get_all_chats() -> List[Chat] :
+    def get_chats() -> List[Chat] :
         chats = Chat.query.filter(Chat.organization_id == current_user.organization_id).order_by(Chat.last_message_at.desc())
+        # chats = chats_query.paginate(page=page, per_page=PAGE_SIZE, error_out=False)
         return chats
     
     def get_or_create(chat_data : object) -> Chat:
@@ -18,7 +20,11 @@ class ChatService:
     
         #If chat does not exist we create it
         if not chat:    
-            chat = Chat(phone=chat_data['phone'], whatsapp_name=chat_data['whatsapp_name'])
+            
+            organization = Organization.query.filter(Organization.wa_phone_id == chat_data['organization_phone_id']).first()
+            organization_id = organization.id if organization else None
+            chat = Chat(phone=chat_data['phone'], whatsapp_name=chat_data['whatsapp_name'], organization_id=organization_id or None)
+            
             db.session.add(chat)
             db.session.commit()
         return chat

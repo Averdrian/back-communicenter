@@ -10,7 +10,7 @@ class Settings:
     SECRET_KEY = os.getenv('SECRET_KEY', os.urandom(24))
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG')
     
-MESSAGES_BY_REQUEST = 20
+PAGE_SIZE = 20
 APPLICATION_TIMEZONE =  pytz.timezone('Europe/Madrid')
     
     

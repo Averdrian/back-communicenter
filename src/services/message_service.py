@@ -7,7 +7,7 @@ from datetime import datetime
 from src.utils.messages_utils import base_headers, graph_messages_url, base_graph_messages_json
 from settings import logger
 from typing import List
-from settings import MESSAGES_BY_REQUEST
+from settings import PAGE_SIZE
 from src.models import ChatStatus
 from flask_login import login_required, current_user
 
@@ -23,15 +23,16 @@ class MessageService:
         return message 
     
     def get_messages(chat : Chat, date: datetime) -> List[Message] | None:
-        messages = Message.query.filter_by(chat_id=chat.id).filter(Message.sent_at < date).order_by(Message.sent_at.desc()).limit(MESSAGES_BY_REQUEST).all()
-        return messages, len(messages) == MESSAGES_BY_REQUEST
+        messages = Message.query.filter_by(chat_id=chat.id).filter(Message.sent_at < date).order_by(Message.sent_at.desc()).limit(PAGE_SIZE).all()
+        return messages, len(messages) == PAGE_SIZE
 
     #This functions recieves the raw json from entring messages, and it returns a simplified object with all relevant mesasge data
     def get_message_data(message_json):
-        
         me_json = message_json['entry'][0]['changes'][0]['value']['messages'][0]
+        phone_number_id = message_json['entry'][0]['changes'][0]['value']['metadata']['phone_number_id']
         
         message_data = {}
+        message_data['organization_phone_id'] = phone_number_id
         message_data['status'] = MessageStatus.DELIVERED.value
         message_data['name'] = message_json['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name']
         message_data['type'] = me_json['type']
@@ -81,7 +82,6 @@ class MessageService:
         message_data['timestamp'] = int(me_json['timestamp'])
         message_data['phone_number'] = me_json['from']
         message_data['wamid'] = me_json['id']
-        
         return message_data
 
 

@@ -5,9 +5,9 @@ from src.services import ChatService
 
 class ChatController:
     
-    def get_all_chats():
+    def get_chats():
         try:
-            chats = ChatService.get_all_chats()
+            chats = ChatService.get_chats()
             return {'success' : True, 'chats': [chat.to_dict() for chat in chats] }, 200
         except Exception as error:
             logger.error(str(error))
