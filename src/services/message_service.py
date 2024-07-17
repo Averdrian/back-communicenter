@@ -159,8 +159,10 @@ class MessageService:
         ret_json = base_graph_messages_json()
         ret_json['type'] = message_json['type']
         ret_json[message_json['type']] = {
-            'id':media_id
+            'id':media_id,
+            'caption': message_json['message'] if message_json['message'] else None
         }
+            
         return ret_json
         
     def _upload_media(media):
