@@ -1,6 +1,6 @@
 from src.models import Chat, ChatStatus, Message, MessageStatus, Organization
 from database import db
-from src.utils.messages_utils import base_headers, graph_messages_url
+from src.utils.messages_utils import base_headers_text, graph_messages_url
 import requests
 from settings import logger
 from flask_login import current_user
@@ -47,7 +47,7 @@ class ChatService:
         
         for message in messages:
             json['message_id'] = message.wamid
-            requests.post(url=graph_messages_url(), json=json, headers=base_headers()) #Call graph api to set messages to read
+            requests.post(url=graph_messages_url(), json=json, headers=base_headers_text()) #Call graph api to set messages to read
             message.status = MessageStatus.READ.value #We also set the messages to read
         
         

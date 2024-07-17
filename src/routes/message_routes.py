@@ -4,6 +4,7 @@ from src.controllers import MessageController
 from datetime import datetime
 import pytz
 from werkzeug.exceptions import BadRequest
+from settings import logger
 
 
 
@@ -15,14 +16,23 @@ class SendMessageSchema(Schema):
     type = fields.String(required=True)
     message = fields.String(required=False)
     preview_url = fields.Bool(required=False)
-    media_id = fields.Integer(required=False)
+    media = fields.Raw(required=False)
 
 
 @message_routes.route('/send', methods=['POST'])
 def send_message():
     try:
+        
+        data = request.form.to_dict()
+        media = request.files.get('media')
+        
+        if media:
+            data['media'] = media 
+        
         send_message_schema = SendMessageSchema()
-        message_data = send_message_schema.load(request.json)
+        message_data = send_message_schema.load(data)
+
+
 
     except ValidationError as error:
         return make_response(({'error': error.messages}, 400))

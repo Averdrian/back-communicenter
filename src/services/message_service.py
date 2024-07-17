@@ -4,7 +4,7 @@ from database import db
 from src.models import Chat, Message, MessageStatus
 from src.events import MessageEvents
 from datetime import datetime
-from src.utils.messages_utils import base_headers, graph_messages_url, base_graph_messages_json
+from src.utils.messages_utils import base_headers_text, base_headers_media, graph_messages_url, base_graph_messages_json, graph_upload_media_url
 from settings import logger
 from typing import List
 from settings import PAGE_SIZE
@@ -122,9 +122,9 @@ class MessageService:
     
     def prepare_message_body(message_json):
         if message_json['type'] == 'text':
-            ret_json = MessageService._prepare_text_message(message_json) 
-        elif message_json['type'] == 'media':
-            ret_json = base_graph_messages_json() #TODO: Media messages
+            ret_json = MessageService._prepare_text_message(message_json)
+        elif message_json['type'] in ['image', 'video', 'audio', 'document']:
+            ret_json = MessageService._prepare_media_message(message_json)
         
         #Phone number
         chat = Chat.query.get(message_json['chat_id'])
@@ -139,7 +139,7 @@ class MessageService:
     @login_required
     def send_message(send_json):
         
-        response = requests.post(url=graph_messages_url(), json=send_json, headers=base_headers())
+        response = requests.post(url=graph_messages_url(), json=send_json, headers=base_headers_text())
         if 'error' in response.json() : raise Exception(response.json()['error']['message'])        
         return response.json()['messages'][0]['id']
     
@@ -151,3 +151,30 @@ class MessageService:
             "body": message_json['message']
         }
         return ret_json
+    
+    def _prepare_media_message(message_json):
+        media_id = MessageService._upload_media(message_json['media'])
+        message_json['media_id'] = media_id
+        
+        ret_json = base_graph_messages_json()
+        ret_json['type'] = message_json['type']
+        ret_json[message_json['type']] = {
+            'id':media_id
+        }
+        return ret_json
+        
+    def _upload_media(media):
+        
+        files = {
+            'messaging_product': (None, 'whatsapp'),
+            'file': (media.filename, media.stream, media.mimetype)
+            
+        }
+        response = requests.post(url=graph_upload_media_url(),
+                                 files=files, 
+                                 headers=base_headers_media()
+                                )
+        
+        if 'error' in response.json() : raise Exception(response.json()['error']['message'])        
+        return response.json()['id']
+    
