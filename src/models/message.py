@@ -34,7 +34,6 @@ class Message(db.Model):
     message = db.Column(db.Text, nullable=True)
     media_id = db.Column(db.BigInteger, nullable=True)
     status = db.Column(db.SmallInteger, nullable=False, default=MessageStatus.PENDING.value)
-    mime_type = db.Column(db.String(20), nullable=True)
     wamid = db.Column(db.String(100), nullable=True, unique=True)
     ref_wamid=db.Column(db.String(100), db.ForeignKey("messages.wamid"), nullable=True, unique=False)
     sent_at = db.Column(db.DateTime, nullable=False)
@@ -46,7 +45,6 @@ class Message(db.Model):
         self.type = Message.get_message_type(message_data['type'])
         self.message = message_data['message'] if 'message' in message_data else None
         self.media_id = message_data['media_id'] if 'media_id' in message_data else None
-        self.mime_type = message_data['mime_type'] if 'mime_type' in message_data else None
         self.wamid = message_data['wamid']
         self.sent_at = datetime.fromtimestamp(message_data['timestamp']) if 'timestamp' in message_data else datetime.now()
         self.ref_wamid = message_data['ref_wamid'] if 'ref_wamid' in message_data else None
@@ -90,7 +88,6 @@ class Message(db.Model):
             'type': MessageType(self.type).name,
             'message': self.message,
             'media_id':self.media_id,
-            'mime_type':self.mime_type,
             'wamid':self.wamid,
             'sent_at':self.sent_at.strftime("%H:%M %d/%m/%Y"),
             'ref_wamid':self.ref_wamid,

@@ -4,27 +4,51 @@ from database import db
 from src.models import Chat, Message, MessageStatus
 from src.events import MessageEvents
 from datetime import datetime
-from src.utils.messages_utils import base_headers_text, base_headers_media, graph_messages_url, base_graph_messages_json, graph_upload_media_url
+from src.utils.messages_utils import base_headers_text, base_headers_media, graph_messages_url, base_graph_messages_json, graph_upload_media_url, graph_get_media_by_id_url
 from settings import logger
 from typing import List
 from settings import PAGE_SIZE
 from src.models import ChatStatus
 from flask_login import login_required, current_user
+import base64
 
 class MessageService:
   
     
-    def create_message(message_data):
+    def create_message(message_data : dict) -> Message:
         
-        message = Message(message_data)
+        message : Message = Message(message_data)
         db.session.add(message)
         db.session.commit()
         
         return message 
     
+    def get_message(message_id : int) -> Message:
+        message : Message = Message.query.get_or_404(message_id)
+        return message
+    
+    
     def get_messages(chat : Chat, date: datetime) -> List[Message] | None:
-        messages = Message.query.filter_by(chat_id=chat.id).filter(Message.sent_at < date).order_by(Message.sent_at.desc()).limit(PAGE_SIZE).all()
+        messages : List[Message] = Message.query.filter_by(chat_id=chat.id).filter(Message.sent_at < date).order_by(Message.sent_at.desc()).limit(PAGE_SIZE).all()
         return messages, len(messages) == PAGE_SIZE
+  
+    
+    def get_message_returning_data(message : Message) -> dict :
+        mess_data : dict = message.as_dict()
+        
+        if message.media_id : 
+            url_data : str = requests.get(url=graph_get_media_by_id_url(message.media_id), headers=base_headers_media())
+            media_response = requests.get(url=url_data.json()['url'], headers=base_headers_media())
+        
+            if media_response.status_code == 200:
+                # Codificar el contenido binario en base64
+                media_base64 = base64.b64encode(media_response.content).decode('utf-8')
+                mess_data['media'] = {
+                    'content': media_base64,    
+                    'mime_type': media_response.headers.get('Content-Type', 'application/octet-stream')
+                }
+            
+        return mess_data
 
     #This functions recieves the raw json from entring messages, and it returns a simplified object with all relevant mesasge data
     def get_message_data(message_json):
@@ -60,7 +84,6 @@ class MessageService:
             elif 'mime_type' in me_json['content']: #Message attached to media types (document, video, photo)
                 message_data['message'] = me_json['content']['caption'] if 'caption' in me_json['content'] else None
                 message_data['media_id'] = me_json['content']['id']
-                message_data['mime_type'] = me_json['content']['mime_type']
             
             elif 'emoji' in me_json['content']: #Reaction
                 message_data['message'] = me_json['content']['emoji']
@@ -179,4 +202,3 @@ class MessageService:
         
         if 'error' in response.json() : raise Exception(response.json()['error']['message'])        
         return response.json()['id']
-    

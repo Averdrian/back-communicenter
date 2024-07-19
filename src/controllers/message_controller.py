@@ -13,6 +13,13 @@ from src.models import ChatStatus
 
 class MessageController:
     
+    def get_message(message_id):
+        message = MessageService.get_message(message_id)
+        ret_json = MessageService.get_message_returning_data(message)
+        return {'success' : True, 'message' : ret_json}, 200
+        
+        
+    
     def get_messages(chat_id, timestamp):
         #If chat does not exist returns error
         chat = Chat.query.get(chat_id)
@@ -23,12 +30,13 @@ class MessageController:
         messages, more_messages = MessageService.get_messages(chat, date)
         
         #Transform all messages into dicts to return as json
-        js_mess = [message.as_dict() for message in messages]
+        js_mess = [MessageService.get_message_returning_data(message) for message in messages]
         
         #Timestamp of last message got
         last_timestamp = messages[-1].sent_at.timestamp() if len(messages) else datetime.now().timestamp()
         
         return {'success': True, 'last_timestamp': last_timestamp, 'messages': js_mess, 'more_messages': more_messages}, 200
+    
     
     def receive_message(message_json):
         try:
@@ -40,7 +48,7 @@ class MessageController:
             MessageEvents.inserted(message)
             
             
-            mess = message.as_dict()
+            mess = {'id' : message.id, 'chat_id' : message.chat_id}
             mess['new_chat_status'] = message.chat.status
             mess['new_chat_status_name'] = ChatStatus(message.chat.status).name
             socketio.emit('receive-message-'+str(message.chat.organization_id), mess)
@@ -78,7 +86,7 @@ class MessageController:
             message = MessageService.create_message(message_json)
             MessageEvents.inserted(message)
             
-            ret = message.as_dict()
+            ret = MessageService.get_message_returning_data(message)
             ret['new_chat_status'] = message.chat.status
             ret['new_chat_status_name'] = ChatStatus(message.chat.status).name
 

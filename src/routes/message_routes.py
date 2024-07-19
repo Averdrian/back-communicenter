@@ -51,3 +51,9 @@ def get_messages(chat_id, timestamp=None):
     if timestamp is None: timestamp = datetime.now(pytz.timezone('Europe/Madrid')).timestamp()
     response = MessageController.get_messages(chat_id, timestamp)
     return make_response(response)
+
+
+@message_routes.route('/id/<message_id>', methods=['GET'])
+def get_message(message_id):
+    response = MessageController.get_message(message_id)
+    return make_response(response)

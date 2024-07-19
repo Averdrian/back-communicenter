@@ -9,6 +9,9 @@ def graph_messages_url() -> str:
 def graph_upload_media_url() -> str:
     return "https://graph.facebook.com/{version}/{phone_id}/media".format(version=os.getenv('WA_API_VERSION'), phone_id=current_user.organization.wa_phone_id)
 
+@login_required
+def graph_get_media_by_id_url(media_id : int) -> str:
+    return "https://graph.facebook.com/{version}/{media_id}".format(version=os.getenv('WA_API_VERSION'), media_id=media_id)
 
 @login_required
 def base_headers_text() -> dict:
@@ -18,7 +21,6 @@ def base_headers_text() -> dict:
     }
     
 @login_required
-
 def base_headers_media() -> dict:
     return {
         "Authorization": "Bearer {token}".format(token=current_user.organization.wa_api_key)
