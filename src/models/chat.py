@@ -48,6 +48,6 @@ class Chat(db.Model):
             'status':self.status,
             'status_name' : ChatStatus(self.status).name,
             'last_message_at': self.last_message_at.strftime("%H:%M %d/%m/%Y"),
-            'expires_at': self.expires_at.strftime("%d/%m/%Y %H:%M"),
+            'expires_at': self.expires_at,
             'country' : self.country
         }
