@@ -36,6 +36,9 @@ class MessageService:
     def get_message_returning_data(message : Message) -> dict :
         mess_data : dict = message.as_dict()
         
+        mess_data['new_chat_status'] = message.chat.status
+        mess_data['new_chat_status_name'] = ChatStatus(message.chat.status).name
+        
         if message.media_id : 
             url_data : str = requests.get(url=graph_get_media_by_id_url(message.media_id), headers=base_headers_media())
             media_response = requests.get(url=url_data.json()['url'], headers=base_headers_media())
