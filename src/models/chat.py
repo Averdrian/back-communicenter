@@ -49,5 +49,5 @@ class Chat(db.Model):
             'status_name' : ChatStatus(self.status).name,
             'last_message_at': self.last_message_at.strftime("%H:%M %d/%m/%Y"),
             'expires_at': str(self.expires_at),
-            'country' : self.country
+            'country' : self.country.lower()
         }
