@@ -30,3 +30,13 @@ def create_note():
     
     response = ChatNoteController.create_note(note_data)
     return make_response(response)
+
+
+
+@chat_note_routes.route('/<int:chat_id>', methods=['GET'])
+def get_notes(chat_id):
+    try:
+        response = ChatNoteController.get_notes(chat_id)
+        return make_response(response)
+    except Exception as error:
+        return make_response(({'error': str(error)}, 500))

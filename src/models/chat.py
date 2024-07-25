@@ -32,7 +32,7 @@ class Chat(db.Model):
         self.status = status.value
         self.whatsapp_name = whatsapp_name
         self.organization_id = organization_id
-        self.country = phone_country(phone)
+        self.country = phone_country(phone).lower()
 
 
     def set_status(self, status : ChatStatus):
@@ -49,5 +49,5 @@ class Chat(db.Model):
             'status_name' : ChatStatus(self.status).name,
             'last_message_at': self.last_message_at.strftime("%H:%M %d/%m/%Y"),
             'expires_at': str(self.expires_at),
-            'country' : self.country.lower()
+            'country' : self.country
         }
