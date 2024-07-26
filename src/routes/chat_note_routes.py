@@ -40,3 +40,12 @@ def get_notes(chat_id):
         return make_response(response)
     except Exception as error:
         return make_response(({'error': str(error)}, 500))
+    
+    
+@chat_note_routes.route('/<int:note_id>', methods=['DELETE'])
+def delete_note(note_id):
+    try:
+        response = ChatNoteController.delete_note(note_id)
+        return make_response(response)
+    except Exception as error:
+        return make_response(({'error': str(error)}, 500))
