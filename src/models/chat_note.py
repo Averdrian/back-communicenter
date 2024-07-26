@@ -20,6 +20,7 @@ class ChatNote(db.Model):
     
     def as_dict(self):
         return {
+            "id" : self.id,
             "chat_id" : self.chat_id,
             "user_id" : self.user_id,
             "username" : self.user.username,

@@ -2,18 +2,19 @@ from database import db
 from src.models import User, UserRole
 from src.services import UserService
 from flask_login import current_user, login_required
+from src.utils.authentication import chief_required
 
 class UserController:
 
-    def register(user_data):
 
+    @chief_required
+    def register(user_data):
         try:
             #Email already exists, throw error
             if User.query.filter_by(email=user_data['email']).first():
                 return {'message': 'Email already taken'}, 400
 
             UserService.create_user(user_data)
-            db.session.commit()
 
             return {'message': 'User created successfully'}, 201
         except Exception as e:

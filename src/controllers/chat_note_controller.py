@@ -22,7 +22,7 @@ class ChatNoteController:
         except Exception as error:
             return {'success': False, 'message': str(error)}, 500
 
-
+    @login_required
     def delete_note(note_id):
         try:
             ChatNoteService.delete_note(note_id)

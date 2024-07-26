@@ -13,6 +13,7 @@ class SignUpSchema(Schema):
     email = fields.String(required=True)
     password = fields.String(required=True)
     organization_id = fields.Integer(required=True)
+    role = fields.Integer(required=False)
 
 @login_required
 @user_routes.route('/signup', methods=['POST'])
