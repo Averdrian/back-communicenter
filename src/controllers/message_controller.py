@@ -51,7 +51,6 @@ class MessageController:
             mess = {'id' : message.id, 'chat_id' : message.chat_id}
             mess['new_chat_status'] = message.chat.status
             mess['new_chat_status_name'] = ChatStatus(message.chat.status).name
-            logger.debug(message.chat.expires_at)
             mess['new_expires_at'] = str(message.chat.expires_at)
             socketio.emit('receive-message-'+str(message.chat.organization_id), mess)
                             

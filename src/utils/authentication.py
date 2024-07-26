@@ -18,6 +18,14 @@ def login_required(func):
         return func(*args, **kwargs)
     return decorate_func
 
+def admin_org_required(func):
+    @login_required
+    def decorate_func(*args, **kwargs):
+        if not current_user.organization.is_admin:
+            return jsonify({'error': 'Unauthorized'}), 401
+        return func(*args, **kwargs)
+    return decorate_func
+
 
 def _is_chief(user):
     return user.role == UserRole.CHIEF.value

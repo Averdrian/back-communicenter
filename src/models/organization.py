@@ -10,6 +10,7 @@ class Organization(db.Model):
     wb_account_id = db.Column(db.BigInteger, unique=True, nullable=False)
     wa_api_key = db.Column(db.String(300), nullable=True)
     wa_verify_token = db.Column(db.String(50), nullable=True)
+    is_admin = db.Column(db.Boolean, nullable=False, default=False)
     users = db.relationship('User', back_populates='organization', lazy='joined')
     chats = db.relationship('Chat', backref='organization', lazy='joined')
     templates = db.relationship('Template', backref='organization', lazy='joined')

@@ -39,7 +39,8 @@ class User(UserMixin, db.Model):
             'id' : self.id,
             'username' : self.username,
             'email' : self.email,
+            'role' : self.role,
             'organization_id' : self.organization_id,
             'organization': self.organization.name,
-            'role' : self.role
+            'organization_is_admin': self.organization.is_admin
         }
