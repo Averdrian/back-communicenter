@@ -2,9 +2,10 @@ from database import db
 from src.models import Chat
 from settings import logger
 from src.services import ChatService
-
+from src.utils.authentication import login_required
 class ChatController:
     
+    @login_required
     def get_chats():
         try:
             ChatService.set_chats_closed()
@@ -13,7 +14,7 @@ class ChatController:
         except Exception as error:
             logger.error(str(error))
             return {'success': False, 'error' : 'Could not get chats'}, 500
-    
+    @login_required
     def chat_read(chat_id):
         try:
             chat : Chat = Chat.query.get(chat_id)
@@ -28,7 +29,7 @@ class ChatController:
             return {'success': False, 'error': str(error)}, 500
         
         
-        
+    @login_required
     def get_chat(chat_id):
         try:
             chat = Chat.query.get_or_404(chat_id)
@@ -36,7 +37,7 @@ class ChatController:
         except Exception:
             return {'success' : False, 'error': 'Chat not found'}, 404
     
-    
+    @login_required
     def update_status(chat_id, status):
         try:
             chat = Chat.query.get_or_404(chat_id)

@@ -2,14 +2,12 @@ from src.models.user import User
 from src.utils.hash_password import check_password, generate_access_token
 from flask_login import login_user, logout_user
 from flask import jsonify
-
+from src.utils.authentication import login_required
 class AuthController:
 
     def login(login_data):
-
         try:
             user : User = User.query.filter_by(email=login_data['email']).first()
-
             if user and check_password(login_data['password'], user.password):
                 login_user(user, remember=False)
                 token = generate_access_token(user.id)
@@ -21,7 +19,7 @@ class AuthController:
         except Exception as e:
             return {'success': False, 'error': 'Failed to login' + str(e)}, 500
         
-
+    @login_required
     def logout():
         logout_user()
         return {'success': True}, 200

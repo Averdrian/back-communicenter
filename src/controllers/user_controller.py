@@ -22,7 +22,7 @@ class UserController:
             db.session.rollback()
             return {'error': 'Failed to create user: ' + str(e)}, 500
         
-        
+    @chief_required
     def get_users(query_args):
         try:
             list_users = UserService.get_users(query_args.items())

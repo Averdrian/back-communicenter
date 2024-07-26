@@ -34,7 +34,6 @@ def create():
     return make_response(response)
 
 
-#TODO:  SOLO ADMINS
 @organization_routes.route('/all', methods=['GET'])
 def get_all():
     response = OrganizationController.get_all()

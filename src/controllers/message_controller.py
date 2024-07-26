@@ -10,16 +10,18 @@ from src.events import MessageEvents
 from flask_login import current_user
 from socketio_instance import socketio
 from src.models import ChatStatus
+from src.utils.authentication import login_required
 
 class MessageController:
     
+    @login_required
     def get_message(message_id):
         message = MessageService.get_message(message_id)
         ret_json = MessageService.get_message_returning_data(message)
         return {'success' : True, 'message' : ret_json}, 200
         
         
-    
+    @login_required
     def get_messages(chat_id, timestamp):
         #If chat does not exist returns error
         chat = Chat.query.get(chat_id)
@@ -74,7 +76,7 @@ class MessageController:
             return {'success': False, 'error': str(error)}, 500
 
 
-
+    @login_required
     def send_message(message_json):
         
         try:            
@@ -88,8 +90,6 @@ class MessageController:
             MessageEvents.inserted(message)
             
             ret = MessageService.get_message_returning_data(message)
-            
-
             
             return {'success': True, 'message': ret}, 201
         except BaseException as error:
