@@ -91,5 +91,5 @@ class Message(db.Model):
             'wamid':self.wamid,
             'sent_at':self.sent_at.strftime("%H:%M %d/%m/%Y"),
             'ref_wamid':self.ref_wamid,
-            'status':MessageStatus(self.status).name
+            'status':MessageStatus(self.status).value
         }

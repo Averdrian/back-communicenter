@@ -141,7 +141,8 @@ class MessageService:
             message.status = status_int
             db.session.add(message)
             db.session.commit()
-            
+        return message    
+        
     def can_send(chat_id):
         chat = Chat.query.get(chat_id)
         return chat.expires_at and datetime.now() < chat.expires_at

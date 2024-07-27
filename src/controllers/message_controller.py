@@ -68,7 +68,9 @@ class MessageController:
     def receive_status(status_json):
         try:
             status, wamid = MessageService.get_status_data(status_json)
-            MessageService.update_status(wamid, status)
+            message = MessageService.update_status(wamid, status)
+            socketio.emit('receive-status-'+str(message.chat_id), {'message_id':message.id, 'status':message.status})
+            
             return {'success': True}, 200
         except Exception as error:
             logger.error(str(error))
