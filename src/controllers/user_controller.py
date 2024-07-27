@@ -2,12 +2,12 @@ from database import db
 from src.models import User, UserRole
 from src.services import UserService
 from flask_login import current_user, login_required
-from src.utils.authentication import chief_required
+from src.utils.authentication import manager_required
 
 class UserController:
 
 
-    @chief_required
+    @manager_required
     def register(user_data):
         try:
             #Email already exists, throw error
@@ -22,7 +22,7 @@ class UserController:
             db.session.rollback()
             return {'error': 'Failed to create user: ' + str(e)}, 500
         
-    @chief_required
+    @manager_required
     def get_users(query_args):
         try:
             list_users = UserService.get_users(query_args.items())

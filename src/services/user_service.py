@@ -2,7 +2,9 @@ from database import db
 from src.utils.hash_password import hash_password
 from src.models import User, UserRole
 from flask_login import current_user
+from sqlalchemy.orm import Query
 import os
+
 
 class UserService:
     
@@ -22,11 +24,11 @@ class UserService:
         
 
     def get_users(query_items):
-        user = User.query
-
-        #If the user is not from the admin organization he only can get his own organization users 
-        if current_user.organization_id != int(os.getenv("ADMIN_ORG_ID")): user = user.filter_by(organization_id=current_user.organization_id) 
+        user : Query = User.query
         
+        #If the user is not from the admin organization he only can get his own organization users 
+        if not current_user.organization.is_admin : user = user.filter_by(organization_id=current_user.organization_id) 
+        else : user = user.group_by(User.organization_id, User.id)
         for key, value in query_items:
             try: user = user.filter(getattr(User,key)==value)
             except Exception as _: continue #If a query item key does not exist in the object we ignore them

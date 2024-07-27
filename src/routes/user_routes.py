@@ -15,7 +15,6 @@ class SignUpSchema(Schema):
     organization_id = fields.Integer(required=True)
     role = fields.Integer(required=False)
 
-@login_required
 @user_routes.route('/signup', methods=['POST'])
 def sign_up():
     try:
@@ -33,7 +32,6 @@ def sign_up():
     return make_response(result)
 
 
-@login_required
 @user_routes.route('/users', methods=['GET'])
 def get_users():
     

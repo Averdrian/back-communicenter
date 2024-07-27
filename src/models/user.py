@@ -4,7 +4,7 @@ from flask_login import UserMixin
 from enum import Enum
 
 class UserRole(Enum):
-    CHIEF = 0
+    MANAGER = 0
     EMPLOYEE = 1
 
 class User(UserMixin, db.Model):

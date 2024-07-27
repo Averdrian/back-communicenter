@@ -1,7 +1,7 @@
 from database import db
 from src.services import OrganizationService
 from settings import logger
-from src.utils.authentication import admin_org_required, chief_required
+from src.utils.authentication import admin_org_required, manager_required
 class OrganizationController:
     
     @admin_org_required
@@ -13,11 +13,11 @@ class OrganizationController:
         except Exception as error:
             return {'success': False, 'message': str(error)}, 500
             
-    @chief_required
+    @admin_org_required
     def get_all():
         try:
             orgs = OrganizationService.get_all()
-            orgs = list(map((lambda org: org.to_dict()), orgs))
+            orgs = list(map((lambda org: {'id':org.id, 'name': org.name}), orgs))
             
             return {'success': True, 'organizations': orgs}, 200
         except Exception as error:
