@@ -12,8 +12,8 @@ organization_prefix = '/organization'
 
 class CreateOrganizationSchema(Schema):
     name = fields.String(required=True)
-    wa_phone_id = fields.Integer(required=True)
-    wb_account_id = fields.Integer(required=True)
+    wa_phone_id = fields.Integer(required=False)
+    wb_account_id = fields.Integer(required=False)
     wa_verify_token = fields.String(required=False)
     wa_api_key = fields.String(required=False)
     
@@ -21,6 +21,7 @@ class CreateOrganizationSchema(Schema):
 @organization_routes.route('/create', methods=['POST'])
 def create():
     try:
+        logger.debug(request.json)
         create_organization_schema = CreateOrganizationSchema()
         organization_data = create_organization_schema.load(request.json)
         
