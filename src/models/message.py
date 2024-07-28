@@ -86,10 +86,18 @@ class Message(db.Model):
             'user_id' : self.user_id,
             'user_name' : self.user.username if self.user is not None else None,
             'type': MessageType(self.type).name,
-            'message': self.message,
+            'message': self._get_message_text(),
             'media_id':self.media_id,
             'wamid':self.wamid,
             'sent_at':self.sent_at.strftime("%H:%M %d/%m/%Y"),
             'ref_wamid':self.ref_wamid,
             'status':MessageStatus(self.status).value
         }
+        
+        
+    def _get_message_text(self):
+        if(self.type == MessageType.LOCATION.value):
+            coords = self.message[1:-1]
+            return 'https://www.google.com/maps/search/?api=1&query={coords}'.format(coords=coords)
+        
+        else: return self.message
