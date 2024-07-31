@@ -22,3 +22,11 @@ class OrganizationController:
             return {'success': True, 'organizations': orgs}, 200
         except Exception as error:
             return {'success': False, 'error': 'Error getting organizations: ' + str(error)}, 500
+
+    @manager_required   
+    def edit_organization(organization_id, organization_data):
+        try:
+            OrganizationService.edit_organization(organization_id, organization_data)
+            return {'success': True}, 204
+        except Exception as e:
+            return {'success': False, 'error': str(e)}, 500

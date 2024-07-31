@@ -39,3 +39,26 @@ def create():
 def get_all():
     response = OrganizationController.get_all()
     return make_response(response)
+
+
+class EditOrganizationSchema(Schema):
+    name = fields.String(required=False)
+    wa_phone_id = fields.Integer(required=False)
+    wb_account_id = fields.Integer(required=False)
+    wa_verify_token = fields.String(required=False)
+    wa_api_key = fields.String(required=False)
+@organization_routes.route('/<int:organization_id>', methods=['PUT'])
+def edit_organization(organization_id):
+    try:
+        edit_user_schema = EditOrganizationSchema()
+        user_data = edit_user_schema.load(request.json)
+
+        response = OrganizationController.edit_organization(organization_id, user_data)
+        return make_response(response)
+    
+    except ValidationError as error:
+        return make_response(({'error': error.messages}), 400)
+    
+    except BadRequest as error:
+        return make_response(({'error': error.description}, 400))
+    

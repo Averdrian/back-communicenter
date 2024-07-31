@@ -2,38 +2,44 @@ from marshmallow import Schema, fields, ValidationError
 from flask import Blueprint, request, make_response
 from flask_login import login_required
 from werkzeug.exceptions import BadRequest
-
+from settings import logger
 from src.controllers import UserController
 
 user_routes = Blueprint('user_routes', __name__)
+user_prefix = '/users'
 
 
-class SignUpSchema(Schema):
-    username = fields.String(required=True)
-    email = fields.String(required=True)
-    password = fields.String(required=True)
-    organization_id = fields.Integer(required=True)
+@user_routes.route('/', methods=['GET'])
+def get_users():
+    
+    result = UserController.get_users(request.args)
+    return make_response(result)    
+
+@user_routes.route('/<int:user_id>')
+def get_user(user_id):
+    response = UserController.get_user(user_id)
+    return make_response(response)
+
+
+class EditUserSchema(Schema):
+    username = fields.String(required=False)
+    email = fields.String(required=False)
+    password = fields.String(required=False)
     role = fields.Integer(required=False)
 
-@user_routes.route('/signup', methods=['POST'])
-def sign_up():
+
+@user_routes.route('/<int:user_id>', methods=['PUT'])
+def update_user(user_id):
     try:
-        create_user_schema = SignUpSchema()
-        user_data = create_user_schema.load(request.json)
-        
+        edit_user_schema = EditUserSchema()
+        user_data = edit_user_schema.load(request.json)
+
+        response = UserController.edit_user(user_id, user_data)
+        return make_response(response)
+    
     except ValidationError as error:
         return make_response(({'error': error.messages}), 400)
     
     except BadRequest as error:
         return make_response(({'error': error.description}, 400))
-        
-    result = UserController.register(user_data)
-
-    return make_response(result)
-
-
-@user_routes.route('/users', methods=['GET'])
-def get_users():
     
-    result = UserController.get_users(request.args)
-    return make_response(result)    

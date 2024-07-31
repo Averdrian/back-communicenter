@@ -3,8 +3,7 @@ from src.utils.hash_password import hash_password
 from src.models import User, UserRole
 from flask_login import current_user
 from sqlalchemy.orm import Query
-import os
-
+from settings import logger
 
 class UserService:
     
@@ -33,3 +32,13 @@ class UserService:
             try: user = user.filter(getattr(User,key)==value)
             except Exception as _: continue #If a query item key does not exist in the object we ignore them
         return user.all()
+    
+    def get_user(user_id: int) -> User:
+        user_query : Query = User.query
+        if not current_user.organization.is_admin: user = user.filter_by(organization_id=current_user.organization_id)
+        user = user_query.get_or_404(user_id)
+        return user
+    
+    def edit_user(user_id: int, user_data : dict) -> None:
+        User.query.filter_by(id=user_id).update(user_data)
+        db.session.commit()
