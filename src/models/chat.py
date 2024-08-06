@@ -9,7 +9,7 @@ class ChatStatus(Enum):
     FIRST_PENDING = 3
     PENDING = 4
     ANSWERED = 5
-    TEMPLATE = 6
+    SEEN = 6
     ALERT = 7
 
 

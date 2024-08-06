@@ -1,6 +1,7 @@
 import bcrypt
 import jwt
 from settings import Settings
+
 def hash_password(password : str) -> bytes:
     salt = bcrypt.gensalt()
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)

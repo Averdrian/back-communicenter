@@ -1,4 +1,4 @@
-from src.models import Chat, Message, ChatStatus
+from src.models import Chat, Message, ChatStatus, MessageStatus
 from database import db
 from datetime import timedelta
 
@@ -13,7 +13,13 @@ class MessageEvents:
         chat.status = MessageEvents._new_chat_status(message, chat).value
         db.session.commit()
             
-                
+    def receive_status(chat_id : int, message_status: MessageStatus) -> None:
+        chat : Chat = Chat.query.get(chat_id)
+        if chat.status == ChatStatus.ANSWERED.value and message_status == MessageStatus.READ:
+            chat.set_status(ChatStatus.SEEN)
+            db.session.add(chat)
+            db.session.commit()
+        
         
     def _new_chat_status(message : Message, chat : Chat) -> ChatStatus:
         if message.user_id : status = ChatStatus.ANSWERED

@@ -1,7 +1,7 @@
 from src.services import MessageService, ChatService
 from database import db
 from settings import logger
-from src.models import Chat
+from src.models import Chat, MessageStatus
 from datetime import datetime
 from flask import jsonify
 from settings import APPLICATION_TIMEZONE
@@ -42,7 +42,7 @@ class MessageController:
     
     def receive_message(message_json):
         try:
-            message_data = MessageService.get_message_data(message_json)
+            message_data = MessageService.get_message_data(message_json)            
             chat = ChatService.get_or_create({'phone':message_data['phone_number'], 'whatsapp_name': message_data['name'], 'organization_phone_id': message_data['organization_phone_id']})
             message_data['chat_id'] = chat.id
 
@@ -54,6 +54,7 @@ class MessageController:
             mess['new_chat_status'] = message.chat.status
             mess['new_chat_status_name'] = ChatStatus(message.chat.status).name
             mess['new_expires_at'] = str(message.chat.expires_at)
+            
             socketio.emit('receive-message-'+str(message.chat.organization_id), mess)
                             
             return {'success': True}, 201
@@ -69,6 +70,8 @@ class MessageController:
         try:
             status, wamid = MessageService.get_status_data(status_json)
             message = MessageService.update_status(wamid, status)
+            MessageEvents.receive_status(message.chat_id, MessageStatus(status))
+            
             socketio.emit('receive-status-'+str(message.chat_id), {'message_id':message.id, 'status':message.status})
             
             return {'success': True}, 200

@@ -13,7 +13,9 @@ template_prefix = '/template'
 def get_all():
     response = TemplateController.get_all()
     return make_response(response)
-    
+
+
+#TODO: CREATE TEMPLATE SCHEMA
 # class CreateTemplateSchema(Schema):
 #     organization_id = fields.String(required=True)
 #     name = fields.String(required=True)
@@ -22,3 +24,11 @@ def get_all():
 # @template_routes.route('/create', methods=['POST'])
 # def create():
     
+@template_routes.route('/create', methods=['POST'])
+def create_template():
+    ...
+    
+    
+@template_routes.route('/send/<int:template_id>', methods=['POST'])
+def send_template(teplate_id):
+    ...

@@ -25,11 +25,11 @@ class ChatService:
         if not chat:    
             
             organization = Organization.query.filter(Organization.wa_phone_id == chat_data['organization_phone_id']).first()
-            organization_id = organization.id if organization else None
-            chat = Chat(phone=chat_data['phone'], whatsapp_name=chat_data['whatsapp_name'], organization_id=organization_id or None)
+            chat = Chat(phone=chat_data['phone'], whatsapp_name=chat_data['whatsapp_name'], organization_id=organization.id)
             
             db.session.add(chat)
             db.session.commit()
+            
         return chat
         
     
@@ -38,7 +38,7 @@ class ChatService:
         #We will set all messages that are not already read 
         
         messages = [message for message in chat.messages \
-                        if message.user_id is None and message.status is not MessageStatus.READ.value]
+                        if message.user_id is None and message.status != MessageStatus.READ.value]
         
         json = {
             "messaging_product": "whatsapp",

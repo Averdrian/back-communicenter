@@ -9,7 +9,7 @@ class AuthController:
         try:
             user : User = User.query.filter_by(email=login_data['email']).first()
             if user and check_password(login_data['password'], user.password):
-                login_user(user, remember=False)
+                login_user(user)
                 token = generate_access_token(user.id)
 
                 return jsonify({'user': user.to_dict(), 'access_token': token}), 200

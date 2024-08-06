@@ -124,6 +124,7 @@ class MessageService:
     
     def get_status_data(status_json):
         status = status_json['entry'][0]['changes'][0]['value']['statuses'][0]['status']
+        status = Message.get_message_status(status)
         wamid = status_json['entry'][0]['changes'][0]['value']['statuses'][0]['id']
         return status, wamid
     
@@ -132,13 +133,12 @@ class MessageService:
     def update_status(wamid, status):
         
         #Get the value of status and the message
-        status_int = Message.get_message_status(status)
         message = Message.query.filter_by(wamid = wamid).first()
         
         #If messages exists and the new status is above the previous, we update it
         #Its common that we dont hook the status in order, thats why we make the second condition 
-        if message and message.status < status_int:
-            message.status = status_int
+        if message and message.status < status:
+            message.status = status
             db.session.add(message)
             db.session.commit()
         return message    

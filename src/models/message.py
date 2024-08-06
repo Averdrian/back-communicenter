@@ -67,7 +67,7 @@ class Message(db.Model):
         return types[message_type].value if message_type in types else MessageType.UNSUPPORTED.value
     
     @staticmethod
-    def get_message_status(message_status : str) -> MessageStatus :
+    def get_message_status(message_status : str) -> int :
         statuses = {
             'sent' : MessageStatus.SENT,
             'delivered' : MessageStatus.DELIVERED,
