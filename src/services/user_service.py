@@ -40,5 +40,9 @@ class UserService:
         return user
     
     def edit_user(user_id: int, user_data : dict) -> None:
+        
+        if 'password' in user_data:
+            user_data['password'] = hash_password(user_data['password'])
+        
         User.query.filter_by(id=user_id).update(user_data)
         db.session.commit()

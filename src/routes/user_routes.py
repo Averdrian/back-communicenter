@@ -15,7 +15,7 @@ def get_users():
     result = UserController.get_users(request.args)
     return make_response(result)    
 
-@user_routes.route('/<int:user_id>')
+@user_routes.route('/<int:user_id>', methods=['GET'])
 def get_user(user_id):
     response = UserController.get_user(user_id)
     return make_response(response)

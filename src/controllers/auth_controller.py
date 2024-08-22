@@ -3,6 +3,7 @@ from src.utils.hash_password import check_password, generate_access_token
 from flask_login import login_user, logout_user
 from flask import jsonify
 from src.utils.authentication import login_required
+
 class AuthController:
 
     def login(login_data):

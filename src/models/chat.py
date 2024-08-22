@@ -11,6 +11,10 @@ class ChatStatus(Enum):
     ANSWERED = 5
     SEEN = 6
     ALERT = 7
+    
+    def status_name(self):
+        names = ["Sin iniciar", "Cerrado", "Resuelto", "Primer pendiente", "Pendiente", "Respondido", "Visto", "Alerta"]
+        return names[self.value]
 
 
 class Chat(db.Model):
@@ -38,6 +42,8 @@ class Chat(db.Model):
     def set_status(self, status : ChatStatus):
         self.status = status.value
 
+    def get_status_name(self):
+        return ChatStatus(self.status).status_name()
 
     def to_dict(self):
         return {
@@ -46,7 +52,7 @@ class Chat(db.Model):
             'whatsapp_name':self.whatsapp_name,
             'organization_id':self.organization_id,
             'status':self.status,
-            'status_name' : ChatStatus(self.status).name,
+            'status_name' : self.get_status_name(),
             'last_message_at': self.last_message_at.strftime("%H:%M %d/%m/%Y"),
             'expires_at': str(self.expires_at),
             'country' : self.country
