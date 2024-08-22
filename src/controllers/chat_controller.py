@@ -3,6 +3,8 @@ from src.models import Chat
 from settings import logger
 from src.services import ChatService
 from src.utils.authentication import login_required
+from socketio_instance import socketio
+
 class ChatController:
     
     @login_required
@@ -47,3 +49,9 @@ class ChatController:
         except Exception as error:
             logger.error(str(error))
             return {'success' : False, 'error' : 'Chat not found'}, 404
+        
+        
+    
+    
+    def send_change_status(organization_id, chat_id, status):
+        socketio.emit('chat-status-'+str(organization_id), {'chat_id': chat_id, 'status': status.value, 'status_name': status.status_name()})

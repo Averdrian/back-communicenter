@@ -19,6 +19,8 @@ class MessageEvents:
             chat.set_status(ChatStatus.SEEN)
             db.session.add(chat)
             db.session.commit()
+            return True
+        return False
         
         
     def _new_chat_status(message : Message, chat : Chat) -> ChatStatus:

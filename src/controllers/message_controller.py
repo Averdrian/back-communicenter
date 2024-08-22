@@ -70,7 +70,11 @@ class MessageController:
         try:
             status, wamid = MessageService.get_status_data(status_json)
             message = MessageService.update_status(wamid, status)
-            MessageEvents.receive_status(message.chat_id, MessageStatus(status))
+            chat_status_seen = MessageEvents.receive_status(message.chat_id, MessageStatus(status))
+              
+            if chat_status_seen:
+                from src.controllers import ChatController
+                ChatController.send_change_status(message.chat.organization_id, message.chat_id, ChatStatus.SEEN)
             
             socketio.emit('receive-status-'+str(message.chat_id), {'message_id':message.id, 'status':message.status})
             
@@ -101,3 +105,8 @@ class MessageController:
             logger.error(str(error))
             db.session.rollback()
             return {'success': False, 'error': str(error)}, 400
+        
+        
+        
+    
+    
