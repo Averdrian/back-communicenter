@@ -28,3 +28,8 @@ def update_status(chat_id : int, status : int):
     
     response = ChatController.update_status(chat_id, status)
     return make_response(response)
+
+@chat_routes.route('/statuses', methods=['GET'])
+def get_statuses():
+    response = ChatController.get_statuses()
+    return make_response(response)
