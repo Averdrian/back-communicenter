@@ -9,6 +9,9 @@ class OrganizationService:
         db.session.add(organization)
         return organization
     
+    def get_organization(organization_id: int) -> Organization:
+        organization = Organization.query.get_or_404(organization_id)
+        return organization
     
     def get_all() -> list[Organization]:
         organizations = Organization.query.all()

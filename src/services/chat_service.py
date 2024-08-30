@@ -12,8 +12,8 @@ class ChatService:
     
     def get_chats() -> List[Chat] :
         chats = Chat.query.filter(
-            Chat.organization_id == current_user.organization_id,
-            Chat.status.notin_([ChatStatus.UNINITIATED.value, ChatStatus.CLOSED.value, ChatStatus.RESOLVED.value])
+            Chat.organization_id == current_user.organization_id
+            # Chat.status.notin_([ChatStatus.UNINITIATED.value, ChatStatus.CLOSED.value, ChatStatus.RESOLVED.value])
         ).order_by(Chat.last_message_at.desc())
         return chats
     
@@ -66,7 +66,7 @@ class ChatService:
     def set_chats_closed():
 
         Chat.query.filter(
-            Chat.status.in_([ChatStatus.ANSWERED.value, ChatStatus.PENDING.value, ChatStatus.FIRST_PENDING.value]),
+            Chat.status.in_([ChatStatus.ANSWERED.value, ChatStatus.PENDING.value, ChatStatus.FIRST_PENDING.value, ChatStatus.SEEN.value, ChatStatus.FIRST_PENDING.value]),
             Chat.expires_at < datetime.now(),
             Chat.organization_id==current_user.organization_id
         ).update({'status' : ChatStatus.CLOSED.value})

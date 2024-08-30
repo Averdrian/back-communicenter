@@ -10,6 +10,8 @@ from werkzeug.exceptions import BadRequest
 organization_routes = Blueprint('organization_routes', __name__)
 organization_prefix = '/organization'
 
+
+
 class CreateOrganizationSchema(Schema):
     name = fields.String(required=True)
     wa_phone_id = fields.Integer(required=False)
@@ -35,6 +37,12 @@ def create():
     return make_response(response)
 
 
+@organization_routes.route('/<int:organization_id>', methods=['GET'])
+def get_organization(organization_id):
+    response = OrganizationController.get_organization(organization_id)
+    return make_response(response)
+
+
 @organization_routes.route('/all', methods=['GET'])
 def get_all():
     response = OrganizationController.get_all()
@@ -50,10 +58,10 @@ class EditOrganizationSchema(Schema):
 @organization_routes.route('/<int:organization_id>', methods=['PUT'])
 def edit_organization(organization_id):
     try:
-        edit_user_schema = EditOrganizationSchema()
-        user_data = edit_user_schema.load(request.json)
+        edit_organization_schema = EditOrganizationSchema()
+        organization_data = edit_organization_schema.load(request.json)
 
-        response = OrganizationController.edit_organization(organization_id, user_data)
+        response = OrganizationController.edit_organization(organization_id, organization_data)
         return make_response(response)
     
     except ValidationError as error:
@@ -61,4 +69,3 @@ def edit_organization(organization_id):
     
     except BadRequest as error:
         return make_response(({'error': error.description}, 400))
-    
