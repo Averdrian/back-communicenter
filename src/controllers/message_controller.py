@@ -23,11 +23,14 @@ class MessageController:
         
     @login_required
     def get_messages(chat_id, timestamp):
+        
         #If chat does not exist returns error
         chat = Chat.query.get(chat_id)
         if not chat: return {'success': False, 'error' : 'chat not found'}, 404
         
         #Transform date and get the messages messages
+        if timestamp is None: timestamp = datetime.now(APPLICATION_TIMEZONE).timestamp()
+
         date = datetime.utcfromtimestamp(timestamp).replace(tzinfo=pytz.utc).astimezone(APPLICATION_TIMEZONE)
         messages, more_messages = MessageService.get_messages(chat, date)
         

@@ -10,12 +10,16 @@ from datetime import datetime
 class ChatService:
     
     
-    def get_chats() -> List[Chat] :
-        chats = Chat.query.filter(
-            Chat.organization_id == current_user.organization_id
-            # Chat.status.notin_([ChatStatus.UNINITIATED.value, ChatStatus.CLOSED.value, ChatStatus.RESOLVED.value])
-        ).order_by(Chat.last_message_at.desc())
-        return chats
+    def get_chats(last_date : datetime, statuses : List[str]) -> List[Chat] :
+        chats = Chat.query
+        
+        chats = chats.filter(
+            Chat.organization_id == current_user.organization_id,
+            Chat.last_message_at < last_date,
+        )
+        if statuses: chats = chats.filter(Chat.status.in_(statuses))
+        chats = chats.order_by(Chat.last_message_at.desc()).limit(PAGE_SIZE).all()
+        return chats, len(chats) == PAGE_SIZE
     
     def get_or_create(chat_data : object) -> Chat:
                 

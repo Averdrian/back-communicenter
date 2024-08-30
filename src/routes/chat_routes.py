@@ -5,10 +5,14 @@ from src.controllers import ChatController
 chat_routes = Blueprint('chat_routes', __name__)
 chat_prefix = '/chat'
 
+@chat_routes.route('/get',  methods=['GET'])
+@chat_routes.route('/get/<float:last_timestamp>',  methods=['GET'])
+def get_chats(last_timestamp = None) :
+    statuses = request.args.get('statuses')
+    if statuses: statuses = [int(status) for status in statuses.split(',')]
 
-@chat_routes.route('',  methods=['GET'])
-def get_chats() :
-    response = ChatController.get_chats()
+    response = ChatController.get_chats(last_timestamp, statuses)
+    
     return make_response(response)
 
 @chat_routes.route('/<int:chat_id>', methods=['GET'])

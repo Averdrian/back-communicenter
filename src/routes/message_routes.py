@@ -5,6 +5,7 @@ from datetime import datetime
 import pytz
 from werkzeug.exceptions import BadRequest
 from settings import logger
+from settings import APPLICATION_TIMEZONE
 
 
 
@@ -22,7 +23,6 @@ class SendMessageSchema(Schema):
 @message_routes.route('/send', methods=['POST'])
 def send_message():
     try:
-        
         data = request.form.to_dict()
         media = request.files.get('media')
         
@@ -48,7 +48,6 @@ def send_message():
 @message_routes.route('/<chat_id>', methods=['GET'])
 @message_routes.route('/<chat_id>/<float:timestamp>', methods=['GET'])
 def get_messages(chat_id, timestamp=None):
-    if timestamp is None: timestamp = datetime.now(pytz.timezone('Europe/Madrid')).timestamp()
     response = MessageController.get_messages(chat_id, timestamp)
     return make_response(response)
 

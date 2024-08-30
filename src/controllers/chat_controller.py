@@ -5,15 +5,22 @@ from src.services import ChatService
 from src.utils.authentication import login_required
 from socketio_instance import socketio
 from src.models import ChatStatus
+from settings import APPLICATION_TIMEZONE
+from datetime import datetime
+import pytz
+
 
 class ChatController:
     
     @login_required
-    def get_chats():
+    def get_chats(last_timestamp, statuses):
         try:
             ChatService.set_chats_closed()
-            chats = ChatService.get_chats()
-            return {'success' : True, 'chats': [chat.to_dict() for chat in chats] }, 200
+            if last_timestamp == None: last_timestamp = datetime.now(APPLICATION_TIMEZONE).timestamp()
+            last_date = datetime.utcfromtimestamp(last_timestamp).replace(tzinfo=pytz.utc).astimezone(APPLICATION_TIMEZONE)
+            chats, more_chats = ChatService.get_chats(last_date, statuses)
+            last = chats[-1].last_message_at.timestamp() if len(chats) else datetime.now().timestamp()
+            return {'success' : True, 'chats': [chat.to_dict() for chat in chats], 'more':more_chats, 'last_timestamp':last }, 200
         except Exception as error:
             logger.error(str(error))
             return {'success': False, 'error' : 'Could not get chats'}, 500
