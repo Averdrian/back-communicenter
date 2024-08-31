@@ -11,7 +11,7 @@ user_prefix = '/users'
 
 @user_routes.route('/', methods=['GET'])
 def get_users():
-    
+
     result = UserController.get_users(request.args)
     return make_response(result)    
 

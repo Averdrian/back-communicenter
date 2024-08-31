@@ -26,8 +26,10 @@ class UserController:
     @manager_required
     def get_users(query_args):
         try:
-            list_users = UserService.get_users(query_args.items())
-            return {'users': [us.to_dict() for us in list_users]}, 200
+            page = query_args.get('page', 1, type=int)
+            organization_id = query_args.get('organization_id', None, type=int)
+            list_users, total_pages = UserService.get_users(page,organization_id)
+            return {'users': list_users, 'pages':total_pages}, 200
         except Exception as e:
             return {'error': 'Failed to get the users: ' + str(e)}, 500
         

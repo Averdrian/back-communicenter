@@ -3,7 +3,7 @@ from src.utils.hash_password import hash_password
 from src.models import User, UserRole
 from flask_login import current_user
 from sqlalchemy.orm import Query
-from settings import logger
+from settings import logger, PAGE_SIZE
 
 class UserService:
     
@@ -22,16 +22,16 @@ class UserService:
         db.session.commit()
         
 
-    def get_users(query_items):
-        user : Query = User.query
-        
+    def get_users(page:int, organization_id: int | None) -> list[User]:
+        users : Query = User.query
         #If the user is not from the admin organization he only can get his own organization users 
-        if not current_user.organization.is_admin : user = user.filter_by(organization_id=current_user.organization_id) 
-        else : user = user.group_by(User.organization_id, User.id)
-        for key, value in query_items:
-            try: user = user.filter(getattr(User,key)==value)
-            except Exception as _: continue #If a query item key does not exist in the object we ignore them
-        return user.all()
+        if not current_user.organization.is_admin : users = users.filter_by(organization_id=current_user.organization_id) 
+        elif organization_id: users = users.filter_by(organization_id=organization_id)
+        users = users.group_by(User.organization_id, User.username, User.id)
+        
+        users = users.paginate(page=page, per_page=PAGE_SIZE, error_out=False)
+        
+        return [user.to_dict() for user in users], users.pages
     
     def get_user(user_id: int) -> User:
         user_query : Query = User.query
