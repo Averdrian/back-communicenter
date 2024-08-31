@@ -43,3 +43,11 @@ def update_user(user_id):
     except BadRequest as error:
         return make_response(({'error': error.description}, 400))
     
+@user_routes.route('/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    try:
+        response = UserController.delete_user(user_id)
+        return make_response(response)
+    except Exception as error:
+        return make_response(({'error': str(error)}, 500))
+    

@@ -47,3 +47,11 @@ class UserController:
             
         except Exception as e:
             return {'success': False, 'error': str(e)}, 500
+        
+    @manager_required
+    def delete_user(user_id):
+        try:
+            UserService.delete_user(user_id)
+            return {'success': True}, 204
+        except Exception as error:
+            return {'success': False, 'message': str(error)}

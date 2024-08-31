@@ -46,3 +46,9 @@ class UserService:
         
         User.query.filter_by(id=user_id).update(user_data)
         db.session.commit()
+        
+        
+    def delete_user(user_id : int) -> None:
+        user : User = User.query.get(user_id) 
+        db.session.delete(user)
+        db.session.commit()

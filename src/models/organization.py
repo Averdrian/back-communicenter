@@ -14,7 +14,6 @@ class Organization(db.Model):
     users = db.relationship('User', back_populates='organization', lazy='joined')
     chats = db.relationship('Chat', backref='organization', lazy='joined')
     templates = db.relationship('Template', backref='organization', lazy='joined')
-    fast_messages = db.relationship('FastMessage', backref='organization', lazy='joined')
 
     def __init__(self, organization_data):
         self.name = organization_data['name']

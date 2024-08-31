@@ -17,6 +17,9 @@ class User(UserMixin, db.Model):
     organization_id = db.Column(db.BigInteger, db.ForeignKey("organizations.id", ondelete='CASCADE'))
     role = db.Column(db.SmallInteger, nullable=False, default=UserRole.EMPLOYEE.value)
     organization = db.relationship('Organization', back_populates='users', lazy='joined')
+    messages = db.relationship('Message', back_populates='user', cascade="all, delete-orphan", passive_deletes=True)
+    chat_notes = db.relationship('ChatNote', back_populates='user', cascade="all, delete-orphan", passive_deletes=True)
+
 
 
     def __init__(self, username, email, password, organization_id, role = UserRole.EMPLOYEE.value):
