@@ -22,7 +22,7 @@ class UserService:
         db.session.commit()
         
 
-    def get_users(page:int, organization_id: int | None) -> list[User]:
+    def get_users(page:int, organization_id: int | None):
         users : Query = User.query
         #If the user is not from the admin organization he only can get his own organization users 
         if not current_user.organization.is_admin : users = users.filter_by(organization_id=current_user.organization_id) 

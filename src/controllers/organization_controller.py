@@ -17,6 +17,14 @@ class OrganizationController:
             return {'success': False, 'message': 'User not found'}, 404
     
     @admin_org_required
+    def get_organizations(page):
+        try:
+            organizations, pages = OrganizationService.get_organizations(page)
+            return {'success': True, 'organizations': organizations, 'pages':pages}, 200
+        except Exception as error:
+            return {'success': False, 'message': str(error)}, 500            
+    
+    @admin_org_required
     def create(organization_data):
         try:
             OrganizationService.create_organization(organization_data)

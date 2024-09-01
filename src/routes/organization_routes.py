@@ -36,6 +36,11 @@ def create():
     response = OrganizationController.create(organization_data)
     return make_response(response)
 
+@organization_routes.route('', methods=['GET'])
+def get_organizations():
+    page = request.args.get('page', 1, type=int)
+    response = OrganizationController.get_organizations(page)
+    return make_response(response)
 
 @organization_routes.route('/<int:organization_id>', methods=['GET'])
 def get_organization(organization_id):
