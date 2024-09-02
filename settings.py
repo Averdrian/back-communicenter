@@ -11,6 +11,8 @@ class Settings:
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG')
     
 PAGE_SIZE = 12
+CHAT_PAGE_SIZE = 20
+USER_PAGE_SIZE = 25
 APPLICATION_TIMEZONE =  pytz.timezone('Europe/Madrid')
     
     

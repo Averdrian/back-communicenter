@@ -3,7 +3,7 @@ from src.utils.hash_password import hash_password
 from src.models import User, UserRole
 from flask_login import current_user
 from sqlalchemy.orm import Query
-from settings import logger, PAGE_SIZE
+from settings import logger, USER_PAGE_SIZE
 
 class UserService:
     
@@ -29,7 +29,7 @@ class UserService:
         elif organization_id: users = users.filter_by(organization_id=organization_id)
         users = users.group_by(User.organization_id, User.username, User.id)
         
-        users = users.paginate(page=page, per_page=PAGE_SIZE, error_out=False)
+        users = users.paginate(page=page, per_page=USER_PAGE_SIZE, error_out=False)
         
         return [user.to_dict() for user in users], users.pages
     

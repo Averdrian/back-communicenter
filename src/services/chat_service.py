@@ -5,7 +5,7 @@ import requests
 from settings import logger
 from flask_login import current_user
 from typing import List
-from settings import PAGE_SIZE
+from settings import PAGE_SIZE, CHAT_PAGE_SIZE
 from datetime import datetime
 class ChatService:
     
@@ -18,8 +18,8 @@ class ChatService:
             Chat.last_message_at < last_date,
         )
         if statuses: chats = chats.filter(Chat.status.in_(statuses))
-        chats = chats.order_by(Chat.last_message_at.desc()).limit(PAGE_SIZE).all()
-        return chats, len(chats) == PAGE_SIZE
+        chats = chats.order_by(Chat.last_message_at.desc()).limit(CHAT_PAGE_SIZE).all()
+        return chats, len(chats) == CHAT_PAGE_SIZE
     
     def get_or_create(chat_data : object) -> Chat:
                 
