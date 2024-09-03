@@ -92,7 +92,6 @@ class MessageController:
     def send_message(message_json):
         
         try:            
-            
             send_json = MessageService.prepare_message_body(message_json)
             wamid = MessageService.send_message(send_json)
             

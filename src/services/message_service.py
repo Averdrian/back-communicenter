@@ -147,6 +147,13 @@ class MessageService:
         chat = Chat.query.get(chat_id)
         return chat.expires_at and datetime.now() < chat.expires_at
     
+    @login_required
+    def send_message(send_json):
+        
+        response = requests.post(url=graph_messages_url(), json=send_json, headers=base_headers_text())
+        if 'error' in response.json() : raise Exception(response.json()['error']['message'])        
+        return response.json()['messages'][0]['id']
+    
     def prepare_message_body(message_json):
         if message_json['type'] == 'text':
             ret_json = MessageService._prepare_text_message(message_json)
@@ -163,12 +170,6 @@ class MessageService:
             if wamid: ret_json['context'] = {'message_id':wamid}
         return ret_json
     
-    @login_required
-    def send_message(send_json):
-        
-        response = requests.post(url=graph_messages_url(), json=send_json, headers=base_headers_text())
-        if 'error' in response.json() : raise Exception(response.json()['error']['message'])        
-        return response.json()['messages'][0]['id']
     
     def _prepare_text_message(message_json):
         ret_json = base_graph_messages_json()
